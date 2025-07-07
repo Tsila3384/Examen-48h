@@ -79,7 +79,7 @@ class Pret
 
             // Calcul de la mensualité avec arrondi à 2 décimales
             $mensualite = round($montant * ($tauxMensuel * pow(1 + $tauxMensuel, $duree)) / (pow(1 + $tauxMensuel, $duree) - 1), 2);
-            $assuranceMensuelle = round(($montant * ($tauxAssurance / 100)) / $duree, 2);
+            $assuranceMensuelle = round(($montant * ($tauxAssurance / 100)) / 12, 2);
             $mensualiteTotale = $mensualite + $assuranceMensuelle;
 
             error_log("validerPret: mensualite_base=$mensualite, assurance_mensuelle=$assuranceMensuelle, mensualite_totale=$mensualiteTotale");
