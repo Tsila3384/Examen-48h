@@ -39,8 +39,6 @@ class AuthController {
     }
 
     public function loginWS() {
-        if (session_status() === PHP_SESSION_NONE) session_start();
-        header('Content-Type: application/json');
         $data = json_decode(file_get_contents('php://input'), true);
         $username = $data['username'] ?? '';
         $password = $data['password'] ?? '';
@@ -50,9 +48,6 @@ class AuthController {
             $user = $userModel->findByEmail($username);
         }
         if ($user && $userModel->verifyPassword($password, $user['password'])) {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['role'] = $user['role'];
-            $_SESSION['user'] = $user;
             echo json_encode([
                 'success' => true,
                 'user_id' => $user['id'],

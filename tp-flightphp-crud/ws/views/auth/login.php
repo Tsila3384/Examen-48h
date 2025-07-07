@@ -26,6 +26,7 @@
                             </div>
                             <button type="submit" class="btn btn-primary w-100">Se connecter</button>
                         </form>
+                        <div id="login-error" class="alert alert-danger mt-3 d-none"></div>
                         <div class="mt-3 text-center">
                             <a href="/inscription">Créer un compte client</a>
                         </div>
@@ -35,11 +36,13 @@
         </div>
     </div>
     <script>
+// Injection PHP pour BASE_URL
+var BASE_URL = "<?php echo defined('BASE_URL') ? BASE_URL : (isset($basePath) ? $basePath : ''); ?>";
 document.querySelector('form').addEventListener('submit', function(e) {
     e.preventDefault();
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
-    fetch('api/login', {
+    fetch(BASE_URL + '/api/login', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -50,15 +53,19 @@ document.querySelector('form').addEventListener('submit', function(e) {
     .then(data => {
         if (data.success) {
             if (data.role === 'admin') {
-                window.location.href = '/admin/dashboard';
+                window.location.href = BASE_URL + '/admin/dashboard';
             } else {
-                window.location.href = '/client/dashboard';
+                window.location.href = BASE_URL + '/client/dashboard';
             }
         } else {
-            alert(data.message || 'Erreur de connexion');
+            document.getElementById('login-error').textContent = data.message || 'Erreur de connexion';
+            document.getElementById('login-error').classList.remove('d-none');
         }
     })
-    .catch(() => alert('Erreur réseau'));
+    .catch(() => {
+        document.getElementById('login-error').textContent = 'Erreur réseau';
+        document.getElementById('login-error').classList.remove('d-none');
+    });
 });
 </script>
 </body>
