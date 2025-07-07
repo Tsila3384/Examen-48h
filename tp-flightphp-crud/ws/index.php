@@ -6,8 +6,6 @@ require 'controllers/UserController.php';
 $base_url = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
 define('BASE_URL', rtrim($base_url, '/'));
 
-
-
 Flight::route('GET /etudiants', function() {
     $db = getDB();
     $stmt = $db->query("SELECT * FROM etudiant");
