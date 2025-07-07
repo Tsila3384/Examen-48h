@@ -88,7 +88,7 @@ class Pret
             }
             
             // Calcul de l'assurance répartie sur toute la durée
-            $assuranceMensuelle = ($montant * ($tauxAssurance / 100)) / $duree;
+            $assuranceMensuelle = ($montant * ($tauxAssurance / 100)) / 12;
             
             // Arrondis avec précision
             $mensualiteBase = round($mensualiteBase, 2);
