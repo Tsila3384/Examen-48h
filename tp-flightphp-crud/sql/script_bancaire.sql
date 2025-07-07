@@ -13,7 +13,7 @@ CREATE TABLE users (
     is_active BOOLEAN DEFAULT TRUE
 );
 
--- Établissement
+-- etablissement
 CREATE TABLE etablissement (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nom VARCHAR(100),
@@ -33,7 +33,7 @@ CREATE TABLE type_pret (
     duree_max INT
 );
 
--- Taux d'intérêt par type de client et type de prêt
+-- Taux d'interêt par type de client et type de prêt
 CREATE TABLE taux (
     id INT PRIMARY KEY AUTO_INCREMENT,
     type_client_id INT,
@@ -95,7 +95,7 @@ CREATE TABLE historique_fonds (
     FOREIGN KEY(id_type_operation) REFERENCES type_operation(id)
 );
 
--- Données initiales
+-- Donnees initiales
 INSERT INTO etablissement (nom, fonds_disponibles) VALUES ('Banque Centrale', 1000000.00);
 
 INSERT INTO type_client (libelle) VALUES 
@@ -104,10 +104,10 @@ INSERT INTO type_client (libelle) VALUES
 
 INSERT INTO statut (libelle) VALUES 
 ('En attente'),
-('Approuvé'),
-('Rejeté'),
+('Approuve'),
+('Rejete'),
 ('En cours'),
-('Terminé');
+('Termine');
 
 INSERT INTO type_operation (libelle) VALUES
 ('Ajout'),
