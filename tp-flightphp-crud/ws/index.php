@@ -1,6 +1,12 @@
 <?php
 require 'vendor/autoload.php';
 require 'db.php';
+require 'controllers/UserController.php';
+
+$base_url = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+define('BASE_URL', rtrim($base_url, '/'));
+
+
 
 Flight::route('GET /etudiants', function() {
     $db = getDB();
@@ -8,36 +14,9 @@ Flight::route('GET /etudiants', function() {
     Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC));
 });
 
-Flight::route('GET /etudiants/@id', function($id) {
-    $db = getDB();
-    $stmt = $db->prepare("SELECT * FROM etudiant WHERE id = ?");
-    $stmt->execute([$id]);
-    Flight::json($stmt->fetch(PDO::FETCH_ASSOC));
-});
+$userController = new UserController();
 
-Flight::route('POST /etudiants', function() {
-    $data = Flight::request()->data;
-    $db = getDB();
-    $stmt = $db->prepare("INSERT INTO etudiant (nom, prenom, email, age) VALUES (?, ?, ?, ?)");
-    $stmt->execute([$data->nom, $data->prenom, $data->email, $data->age]);
-    Flight::json(['message' => 'Étudiant ajouté', 'id' => $db->lastInsertId()]);
-});
-
-Flight::route('PUT /etudiants/@id', function($id) {
-    parse_str(file_get_contents('php://input'), result: $data);
-    if (empty($data)) { die('Aucune donnée reçue'); }
-    $db = getDB();
-    $stmt = $db->prepare("UPDATE etudiant SET nom = ?, prenom = ?, email = ?, age = ? WHERE id = ?");
-    $stmt->execute([$data['nom'], $data['prenom'], $data['email'], $data['age'], $id]) or die(print_r($stmt->errorInfo(), true));
-    Flight::json(['message' => 'Étudiant modifié']);
-});
-
-
-Flight::route('DELETE /etudiants/@id', function($id) {
-    $db = getDB();
-    $stmt = $db->prepare("DELETE FROM etudiant WHERE id = ?");
-    $stmt->execute([$id]);
-    Flight::json(['message' => 'Étudiant supprimé']);
-});
+Flight::route('POST /user/ajouterFond', [$userController, 'ajouterFonds']);
+Flight::route('GET /user/formulaireFond', [$userController, 'formulaireAjoutFonds']);
 
 Flight::start();
