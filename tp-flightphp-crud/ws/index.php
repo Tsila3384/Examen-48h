@@ -1,5 +1,6 @@
 <?php
-
+require_once('controllers/UserController.php');
+require_once('controllers/PretController.php');
 
 // Définition universelle des chemins
 $base_url = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
@@ -54,8 +55,12 @@ Flight::route('GET /admin/dashboard', function() {
     $page = 'dashboard';
     include BASE_PATH . '/views/admin/template/template.php';
 });
+$userController = new UserController();
+$pretController = new PretController();
 
 Flight::route('POST /user/ajouterFond', [$userController, 'ajouterFonds']);
 Flight::route('GET /user/formulaireFond', [$userController, 'formulaireAjoutFonds']);
-
+Flight::route('GET /pret/listePret', [$pretController, 'listePrets']);
+Flight::route('POST /pret/approuverPret', [$pretController, 'approuverPret']);
+Flight::route('POST /pret/valider', [$pretController, 'validerPret']);
 Flight::start();
