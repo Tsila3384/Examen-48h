@@ -1,5 +1,14 @@
 <?php
+// Correction du calcul de $base_url pour garantir le slash initial et pas de slash final
+$base_url = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+if ($base_url === '' || $base_url === '.' || $base_url === '/') $base_url = '';
+$base_url = $base_url ? '/' . ltrim($base_url, '/') : '';
+
+// Définir le chemin de base pour toutes les inclusions et les routes
+$base_dir = __DIR__;
+
 require 'vendor/autoload.php';
+
 require 'db.php';
 require_once __DIR__ . '/app/controllers/AuthController.php';
 
@@ -88,6 +97,46 @@ Flight::route('GET /admin', function() use ($basePath) {
 Flight::route('GET /logout', function() use ($basePath) {
     session_destroy();
     Flight::redirect($basePath . '/login');
+});
+
+// Auth routes
+Flight::route('GET /login', function() {
+    $controller = new AuthController();
+    $controller->login();
+});
+Flight::route('POST /login', function() {
+    $controller = new AuthController();
+    $controller->login();
+});
+Flight::route('GET /logout', function() {
+    $controller = new AuthController();
+    $controller->logout();
+});
+
+// Web service login route
+Flight::route('POST /api/login', function() {
+    $controller = new AuthController();
+    $controller->loginWS();
+});
+
+// Admin dashboard
+Flight::route('GET /S4/Examen-48h/tp-flightphp-crud/ws/admin/dashboard', function() use ($base_dir) {
+    session_start();
+    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+        header('Location: /S4/Examen-48h/tp-flightphp-crud/ws/login');
+        exit;
+    }
+    include $base_dir . '/views/admin/dashboard.php';
+});
+
+// Client dashboard
+Flight::route('GET /S4/Examen-48h/tp-flightphp-crud/ws/client/dashboard', function() use ($base_dir) {
+    session_start();
+    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'client') {
+        header('Location: /S4/Examen-48h/tp-flightphp-crud/ws/login');
+        exit;
+    }
+    include $base_dir . '/views/client/dashboard.php';
 });
 
 Flight::start();
