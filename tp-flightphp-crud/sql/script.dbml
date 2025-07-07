@@ -1,0 +1,83 @@
+// Database definition for banque
+Table users {
+  id int [pk, increment]
+  username varchar(50) [unique, not null]
+  password varchar(255) [not null]
+  email varchar(100) [unique, not null]
+  role enum('admin', 'client') [default: 'client']
+  created_at datetime [default: `CURRENT_TIMESTAMP`]
+  is_active boolean [default: true]
+}
+
+Table etablissement {
+  id int [pk, increment]
+  nom varchar(100)
+  fonds_disponibles decimal(15,2) [default: 0]
+}
+
+Table type_client {
+  id int [pk, increment]
+  libelle varchar(50) [not null]
+}
+
+Table type_pret {
+  id int [pk, increment]
+  nom varchar(50)
+  duree_max int
+}
+
+Table taux {
+  id int [pk, increment]
+  type_client_id int
+  type_pret_id int
+  taux_interet decimal(5,2)
+}
+
+Table clients {
+  id int [pk, increment]
+  nom varchar(100)
+  email varchar(100)
+  salaire decimal(10,2)
+  user_id int [not null]
+  type_client_id int [not null]
+}
+
+Table statut {
+  id int [pk, increment]
+  libelle varchar(100)
+}
+
+Table type_operation {
+  id int [pk, increment]
+  libelle varchar(100)
+}
+
+Table prets {
+  id int [pk, increment]
+  client_id int
+  type_pret_id int
+  montant decimal(12,2)
+  id_statut int [not null]
+  date_demande date
+  mensualite decimal(10,2)
+  duree_mois int
+}
+
+Table historique_fonds {
+  id int [pk, increment]
+  id_etablissement int
+  montant decimal(15,2)
+  id_type_operation int [not null]
+  date_operation datetime [default: `CURRENT_TIMESTAMP`]
+}
+
+// Relationships
+Ref: taux.type_client_id > type_client.id
+Ref: taux.type_pret_id > type_pret.id
+Ref: clients.user_id > users.id
+Ref: clients.type_client_id > type_client.id
+Ref: prets.client_id > clients.id
+Ref: prets.type_pret_id > type_pret.id
+Ref: prets.id_statut > statut.id
+Ref: historique_fonds.id_etablissement > etablissement.id
+Ref: historique_fonds.id_type_operation > type_operation.id
