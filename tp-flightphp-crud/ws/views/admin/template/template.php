@@ -111,6 +111,7 @@
             <li><a href="#">Gestion Prêts</a></li>
             <li><a href="#">Rapports</a></li>
             <li><a href="#">Paramètres</a></li>
+            <li><a href="<?= BASE_URL ?>/admin/typePret"></a></li>
             <li><a href="<?= BASE_URL ?>/logout">Déconnexion</a></li>
         </ul>
     </nav>
