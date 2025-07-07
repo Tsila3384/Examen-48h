@@ -1,8 +1,9 @@
 <?php
-// Pont vers l'application principale
 try {
-    // Redirection vers le workspace
-    header('Location: /Examen-48h/tp-flightphp-crud/ws');
+    $base_url = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
+    $base_url = rtrim($base_url, '/');
+    $redirect = $base_url . '/ws/login';
+    header('Location: ' . $redirect);
     exit();
 } catch (Exception $e) {
     // En cas d'erreur, afficher un message

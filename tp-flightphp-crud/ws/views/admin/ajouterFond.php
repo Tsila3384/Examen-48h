@@ -1,14 +1,13 @@
-
-    <form action="<?= BASE_URL ?>/user/ajouterFond" method="post">
-        <label for="dateAjout">Date d'ajout du fond: </label>
-        <input type="date" name="dateAjout" id="dateAjout" placeholder="Date d'ajout" required>
-        <label for="montant">Montant du fond: </label>
-        <input type="number" name="montant" id="montant" placeholder="Montant à ajouter" required>
-        <input type="submit" value="Ajouter">
-    </form>
+<form action="<?= BASE_URL ?>/user/ajouterFond" method="post">
+    <label for="dateAjout">Date d'ajout du fond: </label>
+    <input type="date" name="dateAjout" id="dateAjout" placeholder="Date d'ajout" required>
+    <label for="montant">Montant du fond: </label>
+    <input type="number" name="montant" id="montant" placeholder="Montant à ajouter" required>
+    <input type="submit" value="Ajouter">
+</form>
 <script>
-    const apiBase = "<?= BASE_URL ?>";
-    
+    const apiBase = "http://localhost<?= BASE_URL ?>";
+
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('form').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -31,11 +30,11 @@
     function ajouterFond() {
         const dateAjout = document.getElementById('dateAjout').value;
         const montant = document.getElementById('montant').value;
-        
+
         const data = `dateAjout=${encodeURIComponent(dateAjout)}&montant=${encodeURIComponent(montant)}`;
-        ajax('POST', '/user/ajouterFond', data, function(response) {
+        ajax('POST','/user/ajouterFond', data, function(response) {
             if (response.success) {
-                alert(response.message || 'Fonds ajoutés avec succès');
+                alert('Fonds ajoutés avec succès');
                 // Réinitialiser le formulaire
                 document.getElementById('dateAjout').value = '';
                 document.getElementById('montant').value = '';
@@ -44,4 +43,5 @@
             }
         });
     }
+
 </script>
