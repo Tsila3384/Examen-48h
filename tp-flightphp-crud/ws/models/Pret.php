@@ -164,7 +164,7 @@ class Pret
         error_log("calculerAmortissement: taux_mensuel=$tauxMensuel");
 
         $mensualite = round($montant * ($tauxMensuel * pow(1 + $tauxMensuel, $duree)) / (pow(1 + $tauxMensuel, $duree) - 1), 2);        
-        $assuranceMensuelle = round(($montant * ($tauxAssurance / 100)) / $duree, 2);
+        $assuranceMensuelle = round(($montant * ($tauxAssurance / 100)) / 12, 2);
         $mensualiteTotale = $mensualite + $assuranceMensuelle;
 
         error_log("calculerAmortissement: mensualite_base=$mensualite, assurance_mensuelle=$assuranceMensuelle, mensualite_totale=$mensualiteTotale");

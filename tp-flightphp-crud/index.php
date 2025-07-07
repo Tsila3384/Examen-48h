@@ -1,7 +1,7 @@
 <?php
 try {
     $base_url = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
-    header('Location: ' . $base_url. '/ws/auth/login');
+    header('Location: ' . $base_url. '/ws');
     exit();
 } catch (Exception $e) {
     // En cas d'erreur, afficher un message
