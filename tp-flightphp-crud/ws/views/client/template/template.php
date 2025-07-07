@@ -58,9 +58,9 @@
             background-color: rgba(255, 255, 255, 0.1);
         }
 
-        .sidebar a.active {
+        /* .sidebar a.active {
             background-color: rgba(255, 255, 255, 0.2);
-        }
+        } */
 
         .main-content {
             margin-left: 250px;
@@ -105,12 +105,9 @@
 
     <nav class="sidebar" id="sidebar">
         <ul>
-            <li><a href="<?= BASE_URL ?>/client/dashboard" class="active">Dashboard</a></li>
-            <li><a href="<?= BASE_URL ?>/client/transactions">Transactions</a></li>
-            <li><a href="<?= BASE_URL ?>/client/transfert">Transférer des fonds</a></li>
+            <li><a href="<?= BASE_URL ?>/client/types-pret" class="active">Type de pret disponible</a></li>
+            <li><a href="<?= BASE_URL ?>/client/dashboard" class="active">Profil</a></li>
             <li><a href="<?= BASE_URL ?>/client/prets/formulairePret">Demandes de prêt</a></li>
-            <li><a href="<?= BASE_URL ?>/client/profil">Profil</a></li>
-            <li><a href="<?= BASE_URL ?>/auth/deconnexion">Déconnexion</a></li>
             <li><a href="<?=  BASE_URL?>/user/listePret">historiques des prets</a></li>
         </ul>
     </nav>

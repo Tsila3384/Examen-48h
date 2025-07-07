@@ -15,16 +15,10 @@ define('BASE_URL', $base_url === '' ? '' : $base_url);
 
 $authController = new AuthController();
 $typePretController = new TypePretController();
+$pretController = new PretController();
+$userController = new UserController();
 
-// Middleware de vérification de rôle
-Flight::before('start', function() use ($authController) {
-    $publicRoutes = ['/auth/connexion', '/auth/inscription'];
-    $current = strtok($_SERVER['REQUEST_URI'], '?');
-    
-    if (!in_array($current, $publicRoutes) && !isset($_SESSION['user'])) {
-        Flight::redirect('/auth/connexion');
-    }
-});
+
 
 // Routes publiques
 Flight::route('GET /auth/connexion', [$authController, 'afficherConnexion']);
