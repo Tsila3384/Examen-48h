@@ -120,4 +120,23 @@ class Pret
         $stmt->execute([$pretId]);
         return $stmt->rowCount() > 0;
     }
+    public function InteretsParMois() {
+        $stmt = $this->db->prepare("SELECT * FROM view_interet_par_mois");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function InteretsParMoisAnnee($dateDebut, $dateFin) {
+        // Convertir les dates en format YYYY-MM pour la comparaison
+        $debutFormate = date('Y-m', strtotime($dateDebut . '-01'));
+        $finFormate = date('Y-m', strtotime($dateFin . '-01'));
+        
+        $stmt = $this->db->prepare("
+            SELECT * FROM view_interet_par_mois 
+            WHERE AnneeMois BETWEEN ? AND ? 
+            ORDER BY AnneeMois
+        ");
+        $stmt->execute([$debutFormate, $finFormate]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

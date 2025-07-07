@@ -117,6 +117,17 @@ JOIN clients c ON p.client_id = c.id
 JOIN type_client tc ON c.type_client_id = tc.id
 JOIN taux t ON t.type_client_id = tc.id AND t.type_pret_id = p.type_pret_id;
 
+-- Vue pour les intérêts par mois
+CREATE VIEW view_interet_par_mois AS
+SELECT 
+    CONCAT(YEAR(m.date_mensualite), '-', LPAD(MONTH(m.date_mensualite), 2, '0')) as AnneeMois,
+    SUM(m.montant) as total_mensualites
+FROM mensualite m
+GROUP BY YEAR(m.date_mensualite), MONTH(m.date_mensualite)
+ORDER BY AnneeMois;
+
+
+
 
 
 

@@ -78,5 +78,7 @@ Flight::route('POST /pret/approuverPret', [$pretController, 'approuverPret']);
 Flight::route('POST /pret/valider', [$pretController, 'validerPret']);
 Flight::route('GET /client/prets/formulairePret', [$pretController, 'afficherFormPret']);
 Flight::route('POST /client/pret/demandePret', [$pretController, 'demandePret']);
+Flight::route('GET /admin/interets', [$pretController, 'afficherListeInteretsParMois']);
+Flight::route('GET /admin/interets/ajax', [$pretController, 'afficherListeInteretsParMoisAjax']);
 
 Flight::start();

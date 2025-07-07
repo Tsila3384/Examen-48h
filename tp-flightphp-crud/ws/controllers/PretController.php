@@ -133,4 +133,38 @@ class PretController {
             'typesPret' => $typesPret
         ]);
     }
+
+    public function afficherListeInteretsParMois() {
+        $dateDebut = Flight::request()->query['date_debut'] ?? null;
+        $dateFin = Flight::request()->query['date_fin'] ?? null;
+        
+        if ($dateDebut && $dateFin) {
+            $interets = $this->PretModel->InteretsParMoisAnnee($dateDebut, $dateFin);
+        } else {
+            $interets = $this->PretModel->InteretsParMois();
+        }
+        
+        Flight::render('admin/template/template', [
+            'page' => 'tableauInterets',
+            'interets' => $interets
+        ]);
+    }
+
+    public function afficherListeInteretsParMoisAjax() {
+        $dateDebut = Flight::request()->query['date_debut'] ?? null;
+        $dateFin = Flight::request()->query['date_fin'] ?? null;
+        
+        if ($dateDebut && $dateFin) {
+            $interets = $this->PretModel->InteretsParMoisAnnee($dateDebut, $dateFin);
+        } else {
+            $interets = $this->PretModel->InteretsParMois();
+        }
+        
+        // Retourner les données en JSON
+        Flight::json([
+            'success' => true,
+            'data' => $interets
+        ]);
+    }
+
 }
