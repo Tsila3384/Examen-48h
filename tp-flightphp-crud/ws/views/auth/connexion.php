@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tableau de bord - Admin</title>
+    <title>Connexion - Système Bancaire</title>
     <style>
         * {
             margin: 0;
@@ -13,12 +13,11 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
         }
 
         .container {
@@ -27,7 +26,7 @@
             border-radius: 15px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 800px;
+            max-width: 400px;
         }
 
         .header {
@@ -46,26 +45,37 @@
             font-size: 16px;
         }
 
-        .info-section {
-            margin-bottom: 30px;
+        .form-group {
+            margin-bottom: 20px;
         }
 
-        .info-section h2 {
+        label {
+            display: block;
+            margin-bottom: 8px;
             color: #333;
-            font-size: 20px;
-            margin-bottom: 15px;
+            font-weight: 500;
         }
 
-        .info-section p {
-            color: #666;
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
             font-size: 16px;
-            margin-bottom: 10px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
         }
 
         .btn {
             width: 100%;
             padding: 12px;
-            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
             border-radius: 8px;
@@ -83,9 +93,24 @@
             transform: translateY(0);
         }
 
+        .links {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .links a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
         .alert {
-            padding: 12px;
-            border-radius: 8px;
+            padding: 10px;
+            border-radius: 5px;
             margin-bottom: 20px;
             display: none;
         }
@@ -106,28 +131,33 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Bienvenue, <?= htmlspecialchars($_SESSION['username'] ?? 'Administrateur') ?> !</h1>
-            <p>Tableau de bord d'administration bancaire</p>
+            <h1>Connexion</h1>
+            <p>Accédez à votre compte bancaire</p>
         </div>
 
         <div id="alert" class="alert"></div>
 
-        <div class="info-section">
-            <h2>Informations administrateur</h2>
-            <p><strong>Nom d'utilisateur :</strong> <?= htmlspecialchars($_SESSION['username'] ?? 'N/A') ?></p>
-            <p><strong>Rôle :</strong> <?= htmlspecialchars($_SESSION['role'] ?? 'N/A') ?></p>
-            <p><strong>Statut :</strong> Administrateur système</p>
-            <!-- Placeholder for additional admin data -->
-            <p><strong>Actions disponibles :</strong> Gestion des utilisateurs, fonds, prêts et rapports</p>
-        </div>
+        <form id="connexionForm">
+            <div class="form-group">
+                <label for="username">Nom d'utilisateur</label>
+                <input type="text" id="username" name="username" required>
+            </div>
 
-        <form id="logoutForm" action="<?= BASE_URL ?>/auth/deconnexion" method="POST">
-            <button type="submit" class="btn">Se déconnecter</button>
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <button type="submit" class="btn">Se connecter</button>
         </form>
+
+        <div class="links">
+            <a href="<?= BASE_URL ?>/auth/inscription">Pas encore de compte ? S'inscrire</a>
+        </div>
     </div>
 
     <script>
-        const form = document.getElementById('logoutForm');
+        const form = document.getElementById('connexionForm');
         const alert = document.getElementById('alert');
 
         function showAlert(message, type) {
@@ -142,12 +172,12 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            const formData = new FormData(form);
+            
             try {
-                const response = await fetch('<?= BASE_URL ?>/auth/deconnexion', {
+                const response = await fetch('<?=BASE_URL ?>/auth/connexion', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
+                    body: formData
                 });
                 
                 const data = await response.json();

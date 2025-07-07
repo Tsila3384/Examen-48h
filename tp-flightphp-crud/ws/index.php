@@ -1,59 +1,46 @@
 <?php
 require_once('controllers/UserController.php');
 require_once('controllers/PretController.php');
+require 'vendor/autoload.php';
+require 'db.php';
+require 'controllers/AuthController.php';
 
-// Définition universelle des chemins
+// Démarrer la session
+session_start();
+
 $base_url = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
-define('BASE_URL', rtrim($base_url, '/'));
-define('BASE_PATH', __DIR__);
+$base_url = rtrim($base_url, '/');
+define('BASE_URL', $base_url === '' ? '' : $base_url);
 
-Flight::route('GET /etudiants', function() {
-    $db = getDB();
-    $stmt = $db->query("SELECT * FROM etudiant");
-    Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC));
+$userController = new UserController();
+$authController = new AuthController();
+
+// Routes d'authentification
+Flight::route('GET /auth/connexion', [$authController, 'afficherConnexion']);
+Flight::route('GET /auth/inscription', [$authController, 'afficherInscription']);
+Flight::route('POST /auth/connexion', [$authController, 'connexion']);
+Flight::route('POST /auth/inscription', [$authController, 'inscription']);
+Flight::route('POST /auth/deconnexion', [$authController, 'deconnexion']);
+
+// Routes utilisateur (protégées)
+Flight::route('POST /user/ajouterFond', function() use ($userController, $authController) {
+    $authController->verifierRole('admin');
+    $userController->ajouterFonds();
 });
 
-// Auth routes
-Flight::route('GET /login', function() {
-    include BASE_PATH . '/views/auth/login.php';
+Flight::route('GET /user/formulaireFond', function() use ($userController, $authController) {
+    $authController->verifierRole('admin');
+    $userController->formulaireAjoutFonds();
 });
 
-Flight::route('GET /client', function() {
-    if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'client') {
-        Flight::redirect(BASE_URL . '/login');
-        return;
-    }
-    include BASE_PATH . '/views/client.php';
-});
-
-Flight::route('GET /admin', function() {
-    if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-        Flight::redirect(BASE_URL . '/login');
-        return;
-    }
-    include BASE_PATH . '/views/admin.php';
-});
-
-Flight::route('GET /logout', function() {
-    session_destroy();
-    Flight::redirect(BASE_URL . '/login');
-});
-
-// Web service login route
-Flight::route('POST /api/login', function() {
-    $controller = new AuthController();
-    $controller->loginWS();
-});
-
-// Admin dashboard
-Flight::route('GET /admin/dashboard', function() {
-    if (session_status() === PHP_SESSION_NONE) session_start();
-    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-        header('Location: ' . BASE_URL . '/login');
-        exit;
-    }
+// Routes admin
+Flight::route('GET /admin/dashboard', function() use ($authController) {
+    $authController->verifierRole('admin');
     $page = 'dashboard';
-    include BASE_PATH . '/views/admin/template/template.php';
+    Flight::render('admin/template/template', [
+        'page' => $page,
+        'user' => $_SESSION
+    ]);
 });
 $userController = new UserController();
 $pretController = new PretController();
@@ -63,4 +50,24 @@ Flight::route('GET /user/formulaireFond', [$userController, 'formulaireAjoutFond
 Flight::route('GET /pret/listePret', [$pretController, 'listePrets']);
 Flight::route('POST /pret/approuverPret', [$pretController, 'approuverPret']);
 Flight::route('POST /pret/valider', [$pretController, 'validerPret']);
+// Routes client
+Flight::route('GET /client/dashboard', function() use ($authController) {
+    $authController->verifierRole('client');
+    $page = 'dashboard';
+    Flight::render('client/template/template', [
+        'page' => $page,
+        'user' => $_SESSION
+    ]);
+});
+
+// Redirection par défaut
+Flight::route('GET /', function() {
+    if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']) {
+        $redirect = $_SESSION['role'] === 'admin' ? '/admin/dashboard' : '/client/dashboard';
+        Flight::redirect($redirect);
+    } else {
+        Flight::redirect('/auth/connexion');
+    }
+});
+
 Flight::start();
