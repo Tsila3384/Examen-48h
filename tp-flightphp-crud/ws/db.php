@@ -13,3 +13,6 @@ function getDB() {
         die(json_encode(['error' => $e->getMessage()]));
     }
 }
+
+// Connexion globale à la base de données pour injection dans les modèles et contrôleurs
+$db = getDB();
