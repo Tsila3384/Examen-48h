@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tableau de bord - Client</title>
+    <title>Tableau de bord - Admin</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -27,7 +27,7 @@
             border-radius: 15px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 600px;
+            max-width: 800px;
         }
 
         .header {
@@ -65,7 +65,7 @@
         .btn {
             width: 100%;
             padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
             color: white;
             border: none;
             border-radius: 8px;
@@ -106,18 +106,19 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Bienvenue, <?= htmlspecialchars($_SESSION['username'] ?? 'Client') ?> !</h1>
-            <p>Votre tableau de bord bancaire</p>
+            <h1>Bienvenue, <?= htmlspecialchars($_SESSION['username'] ?? 'Administrateur') ?> !</h1>
+            <p>Tableau de bord d'administration bancaire</p>
         </div>
 
         <div id="alert" class="alert"></div>
 
         <div class="info-section">
-            <h2>Vos informations</h2>
+            <h2>Informations administrateur</h2>
             <p><strong>Nom d'utilisateur :</strong> <?= htmlspecialchars($_SESSION['username'] ?? 'N/A') ?></p>
             <p><strong>Rôle :</strong> <?= htmlspecialchars($_SESSION['role'] ?? 'N/A') ?></p>
-            <!-- Placeholder for additional user data -->
-            <p><strong>Compte :</strong> Solde non disponible (fonctionnalité à venir)</p>
+            <p><strong>Statut :</strong> Administrateur système</p>
+            <!-- Placeholder for additional admin data -->
+            <p><strong>Actions disponibles :</strong> Gestion des utilisateurs, fonds, prêts et rapports</p>
         </div>
 
         <form id="logoutForm" action="<?= BASE_URL ?>/auth/deconnexion" method="POST">
