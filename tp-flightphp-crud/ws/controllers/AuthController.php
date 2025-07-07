@@ -4,6 +4,7 @@ use Flight\net\Response;
 
 require 'vendor/autoload.php';
 require_once 'models/User.php';
+require_once 'models/Client.php';
 
 class AuthController
 {
@@ -47,10 +48,13 @@ class AuthController
                 session_start();
             }
 
+            $client = new Client();
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
             $_SESSION['logged_in'] = true;
+            $_SESSION['id'] = $client->findClientByUserId($user['id']);
+
 
             Flight::json([
                 'success' => true,

@@ -27,4 +27,17 @@ class Client {
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result ? $result['id'] : null; // Retourne l'ID ou null
     }
+      
+    public function findById($id)
+    {
+        try {
+            $sql = "SELECT * FROM clients WHERE id = ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("Erreur findById Client: " . $e->getMessage());
+            return false;
+        }
+    }
 }

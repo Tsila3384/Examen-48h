@@ -111,6 +111,7 @@
             <li><a href="<?= BASE_URL ?>/client/prets/formulairePret">Demandes de prêt</a></li>
             <li><a href="<?= BASE_URL ?>/client/profil">Profil</a></li>
             <li><a href="<?= BASE_URL ?>/auth/deconnexion">Déconnexion</a></li>
+            <li><a href="<?=  BASE_URL?>/user/listePret">historiques des prets</a></li>
         </ul>
     </nav>
 

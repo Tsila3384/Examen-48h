@@ -114,10 +114,50 @@ class Pret
         $stmt->execute([$id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    public function findByClientId($clientId)
+    {
+        $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE client_id = ?");
+        $stmt->execute([$clientId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
     public function rejeterPret($pretId)
     {
         $stmt = $this->db->prepare("UPDATE {$this->table} SET id_statut = 3 WHERE id = ?");
         $stmt->execute([$pretId]);
         return $stmt->rowCount() > 0;
+    }
+    public function getPretDetailsForPDF($pretId)
+    {
+        $query = "
+        SELECT 
+            p.*,
+            c.nom AS client_nom,
+            c.email AS client_email,
+            c.salaire AS client_salaire,
+            tc.libelle AS type_client,
+            tp.nom AS type_pret,
+            s.libelle AS statut,
+            COALESCE(t.taux_interet, 0) AS taux_interet
+        FROM prets p
+        JOIN clients c ON p.client_id = c.id
+        JOIN type_client tc ON c.type_client_id = tc.id
+        JOIN type_pret tp ON p.type_pret_id = tp.id
+        JOIN statut s ON p.id_statut = s.id
+        LEFT JOIN taux t ON t.type_client_id = tc.id AND t.type_pret_id = tp.id
+        WHERE p.id = :pretId
+    ";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':pretId', $pretId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$result) {
+            throw new Exception("Aucun résultat trouvé pour le prêt ID: $pretId");
+        }
+
+        return $result;
     }
 }

@@ -15,6 +15,7 @@ define('BASE_URL', $base_url === '' ? '' : $base_url);
 
 $userController = new UserController();
 $authController = new AuthController();
+$pretController = new PretController();
 
 // Routes d'authentification
 Flight::route('GET /auth/connexion', [$authController, 'afficherConnexion']);
@@ -33,6 +34,16 @@ Flight::route('GET /user/formulaireFond', function() use ($userController, $auth
     $authController->verifierRole('admin');
     $userController->formulaireAjoutFonds();
 });
+
+// Routes pour les prêts
+Flight::route('GET /user/listePret', function() use ($pretController) {
+    $pretController->afficherPretByUser($_SESSION['id'] );
+});
+Flight::route('/user/prets/pdf/@id', function($id){
+    $pretController = new PretController();
+    $pretController->genererPDF($id);
+});
+
 
 // Routes admin
 Flight::route('GET /admin/dashboard', function() use ($authController) {
