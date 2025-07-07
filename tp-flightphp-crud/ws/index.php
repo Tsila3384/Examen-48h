@@ -1,95 +1,65 @@
 <?php
-
-
-// Correction du calcul de $base_url pour garantir le slash initial et pas de slash final
-$base_url = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
-if ($base_url === '' || $base_url === '.' || $base_url === '/') $base_url = '';
-$base_url = $base_url ? '/' . ltrim($base_url, '/') : '';
-
-// Définir le chemin de base pour toutes les inclusions et les routes
-$base_dir = __DIR__;
-
 require 'vendor/autoload.php';
-
 require 'db.php';
-require 'controllers/AuthController.php';
 require 'controllers/UserController.php';
+require 'controllers/AuthController.php';
+
+// Démarrer la session
+session_start();
 
 $base_url = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
-define('BASE_URL', rtrim($base_url, '/'));
-
-
-if (session_status() === PHP_SESSION_NONE) session_start();
-$authController = new AuthController($db);
-
-// Redirection automatique vers /login si l'utilisateur n'est pas connecté et n'est pas déjà sur une page d'auth
-$publicRoutes = [BASE_URL . '/', BASE_URL . '/login', BASE_URL . '/inscription', BASE_URL . '/api/login'];
-$currentUri = rtrim(strtok($_SERVER['REQUEST_URI'], '?'), '/');
-$publicRoutes = array_map(function($route) { return rtrim($route, '/'); }, $publicRoutes);
-if (!isset($_SESSION['user']) && !in_array($currentUri, $publicRoutes)) {
-    header('Location: ' . BASE_URL . '/login');
-    exit;
-}
-
-// Route principale : redirige toujours vers /login si non connecté
-Flight::route('GET /', function() {
-    if (!isset($_SESSION['user'])) {
-        Flight::redirect(BASE_URL . '/login');
-        return;
-    }
-    if ($_SESSION['user']['role'] === 'admin') {
-        Flight::redirect(BASE_URL . '/admin');
-    } else {
-        Flight::redirect(BASE_URL . '/client');
-    }
-});
-
-// Auth routes
-Flight::route('GET /login', function() {
-    include __DIR__ . '/views/auth/login.php';
-});
-
-Flight::route('GET /client', function() {
-    if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'client') {
-        Flight::redirect(BASE_URL . '/login');
-        return;
-    }
-    include __DIR__ . '/views/client.php';
-});
-
-Flight::route('GET /admin', function() {
-    if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-        Flight::redirect(BASE_URL . '/login');
-        return;
-    }
-    include __DIR__ . '/views/admin.php';
-});
-
-Flight::route('GET /logout', function() {
-    session_destroy();
-    Flight::redirect(BASE_URL . '/login');
-});
-
-// Web service login route
-Flight::route('POST /api/login', function() {
-    $controller = new AuthController();
-    $controller->loginWS();
-});
-
-// Admin dashboard
-Flight::route('GET /admin/dashboard', function() use ($base_dir, $base_url) {
-    if (session_status() === PHP_SESSION_NONE) session_start();
-    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-        header('Location: ' . $base_url . '/login');
-        exit;
-    }
-    include $base_dir . '/views/admin/template/template.php';
-});
+$base_url = rtrim($base_url, '/');
+define('BASE_URL', $base_url === '' ? '' : $base_url);
 
 $userController = new UserController();
+$authController = new AuthController();
 
+// Routes d'authentification
+Flight::route('GET /auth/connexion', [$authController, 'afficherConnexion']);
+Flight::route('GET /auth/inscription', [$authController, 'afficherInscription']);
+Flight::route('POST /auth/connexion', [$authController, 'connexion']);
+Flight::route('POST /auth/inscription', [$authController, 'inscription']);
+Flight::route('POST /auth/deconnexion', [$authController, 'deconnexion']);
 
-Flight::route('POST /user/ajouterFond', [$userController, 'ajouterFonds']);
-Flight::route('GET /user/formulaireFond', [$userController, 'formulaireAjoutFonds']);
+// Routes utilisateur (protégées)
+Flight::route('POST /user/ajouterFond', function() use ($userController, $authController) {
+    $authController->verifierRole('admin');
+    $userController->ajouterFonds();
+});
+
+Flight::route('GET /user/formulaireFond', function() use ($userController, $authController) {
+    $authController->verifierRole('admin');
+    $userController->formulaireAjoutFonds();
+});
+
+// Routes admin
+Flight::route('GET /admin/dashboard', function() use ($authController) {
+    $authController->verifierRole('admin');
+    $page = 'dashboard';
+    Flight::render('admin/template/template', [
+        'page' => $page,
+        'user' => $_SESSION
+    ]);
+});
+
+// Routes client
+Flight::route('GET /client/dashboard', function() use ($authController) {
+    $authController->verifierRole('client');
+    $page = 'dashboard';
+    Flight::render('client/template/template', [
+        'page' => $page,
+        'user' => $_SESSION
+    ]);
+});
+
+// Redirection par défaut
+Flight::route('GET /', function() {
+    if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']) {
+        $redirect = $_SESSION['role'] === 'admin' ? '/admin/dashboard' : '/client/dashboard';
+        Flight::redirect($redirect);
+    } else {
+        Flight::redirect('/auth/connexion');
+    }
+});
 
 Flight::start();
