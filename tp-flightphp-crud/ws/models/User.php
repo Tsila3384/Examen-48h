@@ -1,15 +1,17 @@
 <?php
+// Ce fichier est en conflit avec app/models/User.php. Supprimez ce fichier ou renommez la classe pour éviter le conflit.
+
 require_once __DIR__ . '/../db.php';
 
 class User {
-    private $db;
-    private $table = 'users';
+    protected $table = 'users';
+    protected $db;
 
     public function __construct() {
         $this->db = getDB();
     }
 
-    public function findByUsername($username) {
+   public function findByUsername($username) {
         $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE username = ?");
         $stmt->execute([$username]);
         return $stmt->fetch();
@@ -44,4 +46,14 @@ class User {
         $result = $stmt->fetch();
         return $result ? $result['is_active'] : false;
     }
+
+    public function ajouterFonds($montant, $dateAjout) {
+        $stmt = $this->db->prepare("INSERT INTO historique_fonds (id_etablissement, montant, id_type_operation, date_operation) VALUES (1, ?, 1, ?)");
+        $stmt1 = $this->db->prepare("UPDATE etablissement SET fonds_disponibles = fonds_disponibles + ? WHERE id = 1");
+        $stmt1->execute([$montant]);
+        $stmt->execute([$montant, $dateAjout]);
+        return $stmt->rowCount() > 0;
+    }
+
+    
 }

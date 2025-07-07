@@ -37,7 +37,7 @@
     </div>
     <script>
 // Injection PHP pour BASE_URL
-var BASE_URL = "<?php echo defined('BASE_URL') ? BASE_URL : (isset($basePath) ? $basePath : ''); ?>";
+var BASE_URL = "<?php echo defined('BASE_URL') ? BASE_URL : ''; ?>";
 document.querySelector('form').addEventListener('submit', function(e) {
     e.preventDefault();
     const username = document.getElementById('username').value;
