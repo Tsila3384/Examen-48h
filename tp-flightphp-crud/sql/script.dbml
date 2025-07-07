@@ -54,6 +54,7 @@ Table type_operation {
 
 Table prets {
   id int [pk, increment]
+  id_etablissement int
   client_id int
   type_pret_id int
   montant decimal(12,2)
@@ -81,3 +82,4 @@ Ref: prets.type_pret_id > type_pret.id
 Ref: prets.id_statut > statut.id
 Ref: historique_fonds.id_etablissement > etablissement.id
 Ref: historique_fonds.id_type_operation > type_operation.id
+Ref: prets.id_etablissement > etablissement.id

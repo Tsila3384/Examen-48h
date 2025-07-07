@@ -70,6 +70,7 @@ CREATE TABLE type_operation (
 -- Prêts
 CREATE TABLE prets (
     id INT PRIMARY KEY AUTO_INCREMENT,
+    id_etablissement INT NOT NULL,
     client_id INT,
     type_pret_id INT,
     montant DECIMAL(12,2),
@@ -77,6 +78,7 @@ CREATE TABLE prets (
     date_demande DATE,
     mensualite DECIMAL(10,2),
     duree_mois INT,
+    FOREIGN KEY(id_etablissement) REFERENCES etablissement(id),
     FOREIGN KEY(client_id) REFERENCES clients(id),
     FOREIGN KEY(type_pret_id) REFERENCES type_pret(id),
     FOREIGN KEY(id_statut) REFERENCES statut(id)
