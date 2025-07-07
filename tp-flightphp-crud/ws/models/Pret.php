@@ -9,12 +9,10 @@ class Pret
         $this->db = getDB();
     }
 
-    public function insererPret($clientId, $montant, $typePretId, $dateDebut, $duree)
+    public function insererPret($clientId, $montant, $typePretId, $dateDebut, $duree, $tauxAssurance, $delaiPremierRemboursement)
     {
-        // Utiliser les bonnes colonnes selon votre schéma
-        $stmt = $this->db->prepare("INSERT INTO {$this->table} (id_etablissement, client_id, montant, type_pret_id, date_demande, duree_mois, id_statut) VALUES (1, ?, ?, ?, ?, ?, 1)");
-        $stmt->execute([$clientId, $montant, $typePretId, $dateDebut, $duree]);
-
+        $stmt = $this->db->prepare("INSERT INTO {$this->table} (id_etablissement, client_id, montant, type_pret_id, date_demande, duree_mois, id_statut, taux_assurance, delai_premier_remboursement) VALUES (1, ?, ?, ?, ?, ?, 1, ?, ?)");
+        $stmt->execute([$clientId, $montant, $typePretId, $dateDebut, $duree, $tauxAssurance, $delaiPremierRemboursement]);
         return $this->db->lastInsertId();
     }
 
@@ -23,7 +21,9 @@ class Pret
         $stmt = $this->db->prepare("SELECT taux FROM view_taux_pret WHERE client_id = ? AND type_pret_id = ?");
         $stmt->execute([$idClient, $idTypePret]);
         $result = $stmt->fetch();
-        return $result ? $result['taux'] : null;
+        $taux = $result ? $result['taux'] : 3.0;
+        error_log("recupererTaux: client_id=$idClient, type_pret_id=$idTypePret, taux=$taux");
+        return $taux;
     }
 
     public function findAll()
@@ -39,10 +39,11 @@ class Pret
 
     public function validerPret($pretId)
     {
-        // Démarrer la transaction
         $this->db->beginTransaction();
 
         try {
+            error_log("validerPret: Starting validation for pret_id=$pretId");
+
             // Mettre à jour le statut du prêt
             $stmt = $this->db->prepare("UPDATE {$this->table} SET id_statut = 2 WHERE id = ?");
             $stmt->execute([$pretId]);
@@ -62,55 +63,130 @@ class Pret
             $typePretId = $pret['type_pret_id'];
             $dateDebut = $pret['date_demande'];
             $duree = $pret['duree_mois'];
+            $tauxAssurance = $pret['taux_assurance'];
+            $delaiPremierRemboursement = $pret['delai_premier_remboursement'];
 
-            // Calculer les détails de paiement
+            error_log("validerPret: pret_id=$pretId, client_id=$clientId, montant=$montant, type_pret_id=$typePretId, date_demande=$dateDebut, duree_mois=$duree, taux_assurance=$tauxAssurance, delai_premier_remboursement=$delaiPremierRemboursement");
+
+            // Calculer les détails de paiement (annuité constante)
             $taux = $this->recupererTaux($clientId, $typePretId);
             if (!$taux) {
                 throw new Exception("Impossible de récupérer le taux pour ce prêt");
             }
 
-            $montantTotal = $montant + ($montant * $taux / 100);
-            $mensualite = $montantTotal / $duree;
+            // Conversion du taux annuel en taux mensuel (taux / 100 / 12)
+            $tauxMensuel = $taux / 1200;
+            error_log("validerPret: taux=$taux%, taux_mensuel=$tauxMensuel");
 
-            // Créer les mensualités
+            // Calcul de la mensualité selon la formule d'annuité constante
+            if ($tauxMensuel > 0) {
+                // Formule classique pour taux > 0
+                $mensualiteBase = $montant * ($tauxMensuel * pow(1 + $tauxMensuel, $duree)) / (pow(1 + $tauxMensuel, $duree) - 1);
+            } else {
+                // Si taux = 0, mensualité = montant / durée
+                $mensualiteBase = $montant / $duree;
+            }
+            
+            // Calcul de l'assurance répartie sur toute la durée
+            $assuranceMensuelle = ($montant * ($tauxAssurance / 100)) / 12;
+            
+            // Arrondis avec précision
+            $mensualiteBase = round($mensualiteBase, 2);
+            $assuranceMensuelle = round($assuranceMensuelle, 2);
+            $mensualiteTotale = $mensualiteBase + $assuranceMensuelle;
+
+            error_log("validerPret: mensualite_base=$mensualiteBase, assurance_mensuelle=$assuranceMensuelle, mensualite_totale=$mensualiteTotale");
+
+            // Créer les mensualités avec calcul précis du capital et des intérêts
             $date = new DateTime($dateDebut);
-            $stmtMensualite = $this->db->prepare("INSERT INTO mensualite (pret_id, client_id, montant, date_mensualite) VALUES (?, ?, ?, ?)");
+            if ($delaiPremierRemboursement > 0) {
+                $date->modify("+$delaiPremierRemboursement month");
+            }
+            
+            $stmtMensualite = $this->db->prepare("INSERT INTO mensualite (pret_id, client_id, montant, montant_capital, montant_interets, montant_assurance, date_mensualite) VALUES (?, ?, ?, ?, ?, ?, ?)");
 
+            $capitalRestant = floatval($montant);
+            $totalCapitalRembourse = 0;
+            $totalInteretsPayes = 0;
+            
             for ($i = 0; $i < $duree; $i++) {
                 $paymentDate = clone $date;
                 $paymentDate->modify("+$i month");
 
-                $result = $stmtMensualite->execute([
+                // Calcul des intérêts sur le capital restant dû
+                $interetsMois = $capitalRestant * $tauxMensuel;
+                
+                // Calcul du capital remboursé
+                if ($i == $duree - 1) {
+                    // Dernière mensualité : on solde exactement le capital restant
+                    $capitalRembourse = $capitalRestant;
+                    $mensualiteActuelle = $capitalRembourse + $interetsMois + $assuranceMensuelle;
+                } else {
+                    // Mensualités normales
+                    $capitalRembourse = $mensualiteBase - $interetsMois;
+                    $mensualiteActuelle = $mensualiteTotale;
+                }
+                
+                // Mise à jour du capital restant
+                $capitalRestant = $capitalRestant - $capitalRembourse;
+                
+                // Suivi des totaux pour vérification
+                $totalCapitalRembourse += $capitalRembourse;
+                $totalInteretsPayes += $interetsMois;
+                
+                // Arrondis finaux pour la base de données
+                $interetsMoisArrondi = round($interetsMois, 2);
+                $capitalRemburseArrondi = round($capitalRembourse, 2);
+                $assuranceMensuelleArrondie = round($assuranceMensuelle, 2);
+                $mensualiteActuelleArrondie = round($mensualiteActuelle, 2);
+                $capitalRestantArrondi = round(max($capitalRestant, 0), 2);
+
+                error_log("validerPret: Mois " . ($i + 1) . ", date=" . $paymentDate->format('Y-m-d') . 
+                         ", capital_restant_avant=$capitalRestantArrondi, interets=$interetsMoisArrondi" . 
+                         ", capital_rembourse=$capitalRemburseArrondi, assurance=$assuranceMensuelleArrondie" . 
+                         ", mensualite=$mensualiteActuelleArrondie");
+
+                $stmtMensualite->execute([
                     $pretId,
                     $clientId,
-                    $mensualite,
+                    $mensualiteActuelleArrondie,
+                    $capitalRemburseArrondi,
+                    $interetsMoisArrondi,
+                    $assuranceMensuelleArrondie,
                     $paymentDate->format('Y-m-d')
                 ]);
-
-                if (!$result) {
-                    throw new Exception("Erreur lors de la création de la mensualité " . ($i + 1));
-                }
             }
+            
+            error_log("validerPret: Fin calculs - Capital total remboursé: " . round($totalCapitalRembourse, 2) . 
+                     ", Intérêts totaux: " . round($totalInteretsPayes, 2) . 
+                     ", Montant initial: $montant");
+
+            // Mettre à jour les fonds disponibles de l'établissement
+            $stmtEtablissement = $this->db->prepare("UPDATE etablissement SET fonds_disponibles = fonds_disponibles - ? WHERE id = ?");
+            $stmtEtablissement->execute([$montant, $pret['id_etablissement']]);
+
+            // Enregistrer l'opération dans l'historique
+            $stmtHistorique = $this->db->prepare("INSERT INTO historique_fonds (id_etablissement, montant, id_type_operation, date_operation) VALUES (?, ?, 2, NOW())");
+            $stmtHistorique->execute([$pret['id_etablissement'], $montant]);
 
             // Valider la transaction
             $this->db->commit();
+            error_log("validerPret: Validation successful for pret_id=$pretId");
             return true;
         } catch (Exception $e) {
-            // Annuler la transaction en cas d'erreur
             $this->db->rollback();
-
-            // Optionnel : logger l'erreur
-            error_log("Erreur lors de la validation du prêt {$pretId}: " . $e->getMessage());
-
-            // Retourner false ou relancer l'exception selon vos besoins
+            error_log("validerPret: Erreur lors de la validation du prêt {$pretId}: " . $e->getMessage());
             return false;
-            // ou: throw $e;
         }
     }
 
     public function findById($id)
     {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE id = ?");
+        $stmt = $this->db->prepare("SELECT p.*, tp.nom as type_pret_nom, c.nom as client_nom 
+                                   FROM {$this->table} p 
+                                   LEFT JOIN type_pret tp ON p.type_pret_id = tp.id 
+                                   LEFT JOIN clients c ON p.client_id = c.id 
+                                   WHERE p.id = ?");
         $stmt->execute([$id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
@@ -159,5 +235,93 @@ class Pret
         }
 
         return $result;
+        }
+    public function InteretsParMois() {
+        $stmt = $this->db->prepare("SELECT * FROM view_interet_par_mois");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function InteretsParMoisAnnee($dateDebut, $dateFin) {
+        // Convertir les dates en format YYYY-MM pour la comparaison
+        $debutFormate = date('Y-m', strtotime($dateDebut . '-01'));
+        $finFormate = date('Y-m', strtotime($dateFin . '-01'));
+        
+        $stmt = $this->db->prepare("
+            SELECT * FROM view_interet_par_mois 
+            WHERE AnneeMois BETWEEN ? AND ? 
+            ORDER BY AnneeMois
+        ");
+        $stmt->execute([$debutFormate, $finFormate]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+    public function calculerAmortissement($montant, $taux, $duree, $tauxAssurance, $delaiPremierRemboursement)
+    {
+        error_log("calculerAmortissement: montant=$montant, taux=$taux, duree=$duree, taux_assurance=$tauxAssurance, delai_premier_remboursement=$delaiPremierRemboursement");
+
+        // Conversion du taux annuel en taux mensuel
+        $tauxMensuel = $taux / 100 / 12;
+        error_log("calculerAmortissement: taux_mensuel=$tauxMensuel");
+
+        // Calcul de la mensualité selon la formule d'annuité constante
+        if ($tauxMensuel > 0) {
+            $mensualiteBase = $montant * ($tauxMensuel * pow(1 + $tauxMensuel, $duree)) / (pow(1 + $tauxMensuel, $duree) - 1);
+        } else {
+            // Si taux = 0, mensualité = montant / durée
+            $mensualiteBase = $montant / $duree;
+        }
+        
+        $assuranceMensuelle = ($montant * ($tauxAssurance / 100)) / $duree;
+        $mensualiteTotale = $mensualiteBase + $assuranceMensuelle;
+
+        error_log("calculerAmortissement: mensualite_base=$mensualiteBase, assurance_mensuelle=$assuranceMensuelle, mensualite_totale=$mensualiteTotale");
+
+        $amortissement = [];
+        $capitalRestant = floatval($montant);
+        $date = new DateTime();
+        if ($delaiPremierRemboursement > 0) {
+            $date->modify("+$delaiPremierRemboursement month");
+        }
+
+        for ($i = 0; $i < $duree; $i++) {
+            $paymentDate = clone $date;
+            $paymentDate->modify("+$i month");
+            
+            // Calcul des intérêts sur le capital restant
+            $interets = $capitalRestant * $tauxMensuel;
+            
+            // Calcul du capital remboursé
+            if ($i == $duree - 1) {
+                // Dernière mensualité : solder exactement le capital restant
+                $capitalRembourse = $capitalRestant;
+                $mensualiteActuelle = $capitalRembourse + $interets + $assuranceMensuelle;
+            } else {
+                $capitalRembourse = $mensualiteBase - $interets;
+                $mensualiteActuelle = $mensualiteTotale;
+            }
+            
+            $capitalRestant = $capitalRestant - $capitalRembourse;
+
+            error_log("calculerAmortissement: Mois " . ($i + 1) . ", date=" . $paymentDate->format('Y-m-d') . 
+                     ", capital_restant=" . round(max($capitalRestant, 0), 2) . 
+                     ", interets=" . round($interets, 2) . 
+                     ", capital_rembourse=" . round($capitalRembourse, 2) . 
+                     ", assurance=" . round($assuranceMensuelle, 2) . 
+                     ", mensualite=" . round($mensualiteActuelle, 2));
+
+            $amortissement[] = [
+                'mois' => $i + 1,
+                'date' => $paymentDate->format('Y-m-d'),
+                'mensualite' => round($mensualiteActuelle, 2),
+                'capital' => round($capitalRembourse, 2),
+                'interets' => round($interets, 2),
+                'assurance' => round($assuranceMensuelle, 2),
+                'capital_restant' => round(max($capitalRestant, 0), 2)
+            ];
+        }
+
+        return $amortissement;
     }
 }

@@ -117,6 +117,20 @@ JOIN clients c ON p.client_id = c.id
 JOIN type_client tc ON c.type_client_id = tc.id
 JOIN taux t ON t.type_client_id = tc.id AND t.type_pret_id = p.type_pret_id;
 
+-- Vue pour les intérêts par mois
+CREATE OR REPLACE VIEW view_interet_par_mois AS
+SELECT 
+    CONCAT(YEAR(m.date_mensualite), '-', LPAD(MONTH(m.date_mensualite), 2, '0')) as AnneeMois,
+    SUM(COALESCE(m.montant_interets, 0)) as total_interets,
+    SUM(COALESCE(m.montant_capital, 0)) as total_capital,
+    SUM(COALESCE(m.montant_assurance, 0)) as total_assurance,
+    SUM(COALESCE(m.montant_interets, 0) + COALESCE(m.montant_capital, 0) + COALESCE(m.montant_assurance, 0)) as total_mensualites
+FROM mensualite m
+GROUP BY YEAR(m.date_mensualite), MONTH(m.date_mensualite)
+ORDER BY AnneeMois;
+
+
+
 
 
 
@@ -182,3 +196,12 @@ INSERT INTO prets (id_etablissement, client_id, type_pret_id, montant, id_statut
 -- Prêt 5 : Client 1, prêt auto, terminé
 INSERT INTO prets (id_etablissement, client_id, type_pret_id, montant, id_statut, date_demande, duree_mois) VALUES
 (1, 1, 2, 300000.00, 5, '2022-01-01', 60);
+
+ALTER TABLE prets ADD taux_assurance DECIMAL(5,2) DEFAULT 0;
+ALTER TABLE prets ADD delai_premier_remboursement INT DEFAULT 0;
+
+
+ALTER TABLE mensualite
+ADD montant_capital DECIMAL(10,2) DEFAULT 0,
+ADD montant_interets DECIMAL(10,2) DEFAULT 0,
+ADD montant_assurance DECIMAL(10,2) DEFAULT 0;

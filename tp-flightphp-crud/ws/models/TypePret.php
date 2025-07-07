@@ -11,6 +11,14 @@ class TypePret
         $this->db = getDB();
     }
 
+    public function findAll()
+    {
+        $stmt = $this->db->prepare("SELECT * FROM {$this->table}");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    
     public function create($data)
     {
         $stmt = $this->db->prepare("INSERT INTO {$this->table} (nom, duree_max) VALUES (:nom, :duree_max)");
@@ -18,13 +26,6 @@ class TypePret
             ':nom' => $data['nom'],
             ':duree_max' => $data['duree_max']
         ]);
-    }
-
-    public function findAll()
-    {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table} ORDER BY nom");
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function findById($id)
