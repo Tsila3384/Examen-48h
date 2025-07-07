@@ -106,7 +106,7 @@
     <nav class="sidebar" id="sidebar">
         <ul>
             <li><a href="#" class="active">Dashboard</a></li>
-            <li><a href="<?= BASE_URL ?>/admin/ajouterFond">Ajouter Fonds</a></li>
+            <li><a href="<?= BASE_URL ?>/user/ajouterFond">Ajouter Fonds</a></li>
             <li><a href="#">Gestion Clients</a></li>
             <li><a href="#">Gestion Prêts</a></li>
             <li><a href="#">Rapports</a></li>
@@ -136,7 +136,7 @@
             });
         </script>
 
-        <?php include __DIR__ . '/../' . $page.'.php'; ?>
+    
         </main>
 </body>
 </html>
