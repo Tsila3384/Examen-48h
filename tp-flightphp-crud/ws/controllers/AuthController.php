@@ -51,12 +51,14 @@ class AuthController
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
             $_SESSION['logged_in'] = true;
+            $_SESSION['id'] = $this->userModel->getIdClient($_SESSION['user_id']);
+
 
             Flight::json([
                 'success' => true,
                 'message' => 'Connexion réussie',
                 'role' => $user['role'],
-                'redirect' => BASE_URL . ($user['role'] === 'admin' ? '/admin/dashboard' : '/client/dashboard')
+                'redirect' => BASE_URL . ($user['role'] === 'admin' ? '/admin/dashboard' : '/client/types-pret')
             ]);
         } else {
             Flight::json([
