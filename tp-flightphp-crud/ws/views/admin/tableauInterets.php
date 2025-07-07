@@ -702,29 +702,17 @@ function genererContenuTableau(interets) {
                 <tr>
                     <th>Période (Année-Mois)</th>
                     <th>Total des Mensualités</th>
-                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>`;
 
     interets.forEach(interet => {
-        const pourcentage = totalGeneral > 0 ? (parseFloat(interet.total_mensualites) / totalGeneral) * 100 : 0;
         html += `<tr>
             <td>
                 <span class="periode">${interet.AnneeMois}</span>
             </td>
             <td>
                 <span class="montant">${formatNumber(parseFloat(interet.total_mensualites))} Ar</span>
-            </td>
-            <td>
-                <div class="actions">
-                    <button class="btn btn-sm btn-info" onclick="voirDetailsMois('${interet.AnneeMois}')" title="Voir détails">
-                        <i class="fas fa-eye"></i> Détails
-                    </button>
-                    <button class="btn btn-sm btn-secondary" onclick="exporterMois('${interet.AnneeMois}')" title="Exporter">
-                        <i class="fas fa-download"></i> Export
-                    </button>
-                </div>
             </td>
         </tr>`;
     });
@@ -734,11 +722,6 @@ function genererContenuTableau(interets) {
                 <tr class="total-row">
                     <td><strong>TOTAL GÉNÉRAL</strong></td>
                     <td><strong>${formatNumber(totalGeneral)} Ar</strong></td>
-                    <td>
-                        <button class="btn btn-sm btn-success" onclick="exporterTout()" title="Exporter tout">
-                            <i class="fas fa-file-excel"></i> Export Global
-                        </button>
-                    </td>
                 </tr>
             </tfoot>
         </table>
@@ -790,18 +773,6 @@ function viderFiltres() {
     document.getElementById('date_debut').value = '';
     document.getElementById('date_fin').value = '';
     chargerDonnees();
-}
-
-function voirDetailsMois(anneeMois) {
-    alert('Fonctionnalité "Voir détails" à implémenter pour la période : ' + anneeMois);
-}
-
-function exporterMois(anneeMois) {
-    alert('Fonctionnalité "Exporter" à implémenter pour la période : ' + anneeMois);
-}
-
-function exporterTout() {
-    alert('Fonctionnalité "Export global" à implémenter');
 }
 
 // Charger les données initiales au chargement de la page
