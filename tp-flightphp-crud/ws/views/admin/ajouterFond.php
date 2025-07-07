@@ -14,7 +14,7 @@
             ajouterFond();
         });
     });
-
+    
     function ajax(method, url, data, callback) {
         const xhr = new XMLHttpRequest();
         xhr.open(method, apiBase + url, true);
@@ -26,7 +26,7 @@
         };
         xhr.send(data);
     }
-
+    
     function ajouterFond() {
         const dateAjout = document.getElementById('dateAjout').value;
         const montant = document.getElementById('montant').value;

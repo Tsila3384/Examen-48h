@@ -1,3 +1,4 @@
+-- Active: 1744780646950@@127.0.0.1@3306@banque
 CREATE DATABASE IF NOT EXISTS banque;
 
 USE banque;
@@ -76,13 +77,22 @@ CREATE TABLE prets (
     montant DECIMAL(12,2),
     id_statut INT NOT NULL,
     date_demande DATE,
-    mensualite DECIMAL(10,2),
     duree_mois INT,
     FOREIGN KEY(id_etablissement) REFERENCES etablissement(id),
     FOREIGN KEY(client_id) REFERENCES clients(id),
     FOREIGN KEY(type_pret_id) REFERENCES type_pret(id),
     FOREIGN KEY(id_statut) REFERENCES statut(id)
 );
+
+CREATE TABLE mensualite(
+    id PRIMARY KEY AUTO_INCREMENT,
+    pret_id INT NOT NULL,
+    client_id INT NOT NULL,
+    montant DECIMAL(12,2),
+    date_mensualite DATE,
+    FOREIGN KEY(pret_id) REFERENCES prets(id),
+    FOREIGN KEY(client_id) REFERENCES clients(id)
+)
 
 -- Historique des fonds
 CREATE TABLE historique_fonds (
@@ -94,6 +104,21 @@ CREATE TABLE historique_fonds (
     FOREIGN KEY(id_etablissement) REFERENCES etablissement(id),
     FOREIGN KEY(id_type_operation) REFERENCES type_operation(id)
 );
+
+--vue recuperation de taux
+CREATE VIEW view_taux_pret AS
+SELECT 
+    p.id as pret_id,
+    p.client_id,
+    p.type_pret_id,
+    t.taux_interet as taux
+FROM prets p
+JOIN clients c ON p.client_id = c.id
+JOIN type_client tc ON c.type_client_id = tc.id
+JOIN taux t ON t.type_client_id = tc.id AND t.type_pret_id = p.type_pret_id;
+
+
+
 
 -- Donnees initiales
 INSERT INTO etablissement (nom, fonds_disponibles) VALUES ('Banque Centrale', 1000000.00);
@@ -126,3 +151,4 @@ INSERT INTO taux (type_client_id, type_pret_id, taux_interet) VALUES
 (2, 1, 7.0),  -- Entreprise, Prêt Personnel
 (2, 2, 5.5),  -- Entreprise, Prêt Auto
 (2, 3, 3.2);  -- Entreprise, Prêt Immobilier
+
