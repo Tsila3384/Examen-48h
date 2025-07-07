@@ -111,7 +111,8 @@
             <li><a href="<?= BASE_URL ?>/pret/listePret">Gestion Prêts</a></li>
             <li><a href="#">Rapports</a></li>
             <li><a href="#">Paramètres</a></li>
-            <li><a href="<?= BASE_URL ?>/auth/deconnexion">Déconnexion</a></li>
+            <li><a href="<?= BASE_URL ?>/admin/typePret"></a></li>
+            <li><a href="<?= BASE_URL ?>/logout">Déconnexion</a></li>
         </ul>
     </nav>
 
