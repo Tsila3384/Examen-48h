@@ -260,7 +260,7 @@ class PretController
         $tauxAssurance = $input['taux_assurance'] ?? 0;
 
         if ($montant > 0 && $duree > 0 && $tauxInteret >= 0 && $tauxAssurance >= 0) {
-            $amortissement = $this->PretModel->calculerAmortissement($montant, $tauxInteret, $duree, $tauxAssurance, 0);
+            $amortissement = $this->pretModel->calculerAmortissement($montant, $tauxInteret, $duree, $tauxAssurance, 0);
             Flight::json([
                 'success' => true,
                 'data' => $amortissement
