@@ -7,7 +7,7 @@
         <input type="submit" value="Ajouter">
     </form>
 <script>
-    const apiBase = "http://localhost/S4/MrRojo/tp-flightphp-crud/tp-flightphp-crud/ws";
+    const apiBase = "http://localhost<?= BASE_URL ?>";
     function ajax(method, url, data, callback) {
         const xhr = new XMLHttpRequest();
         xhr.open(method, apiBase + url, true);
