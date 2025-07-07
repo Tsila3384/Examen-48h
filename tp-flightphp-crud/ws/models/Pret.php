@@ -81,5 +81,10 @@ class Pret
         $stmt->execute([$id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+    public function rejeterPret($pretId) {
+        $stmt = $this->db->prepare("UPDATE {$this->table} SET id_statut = 3 WHERE id = ?");
+        $stmt->execute([$pretId]);
+        return $stmt->rowCount() > 0;
+    }
 
 }

@@ -49,7 +49,11 @@ Flight::route('GET /admin/dashboard', function() use ($authController) {
 $userController = new UserController();
 $pretController = new PretController();
 
-<<<<<<<<< Temporary merge branch 1
+Flight::route('POST /user/ajouterFond', [$userController, 'ajouterFonds']);
+Flight::route('GET /user/formulaireFond', [$userController, 'formulaireAjoutFonds']);
+Flight::route('GET /pret/listePret', [$pretController, 'listePrets']);
+Flight::route('POST /pret/approuverPret', [$pretController, 'approuverPret']);
+Flight::route('POST /pret/valider', [$pretController, 'validerPret']);
 // Routes client
 Flight::route('GET /client/dashboard', function() use ($authController) {
     $authController->verifierRole('client');
@@ -70,11 +74,12 @@ Flight::route('GET /', function() {
     }
 });
 
-=========
 Flight::route('POST /user/ajouterFond', [$userController, 'ajouterFonds']);
 Flight::route('GET /user/formulaireFond', [$userController, 'formulaireAjoutFonds']);
 Flight::route('GET /pret/listePret', [$pretController, 'listePrets']);
 Flight::route('POST /pret/approuverPret', [$pretController, 'approuverPret']);
 Flight::route('POST /pret/valider', [$pretController, 'validerPret']);
->>>>>>>>> Temporary merge branch 2
+Flight::route('GET /client/prets/formulairePret', [$pretController, 'afficherFormPret']);
+Flight::route('POST /client/pret/demandePret', [$pretController, 'demandePret']);
+
 Flight::start();
