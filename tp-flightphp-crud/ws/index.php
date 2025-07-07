@@ -66,4 +66,67 @@ Flight::route('GET /', function() {
     }
 });
 
+<<<<<<< Updated upstream
+=======
+// Auth routes
+Flight::route('GET /login', function() {
+    include __DIR__ . '/views/auth/login.php';
+});
+
+Flight::route('GET /client', function() {
+    if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'client') {
+        Flight::redirect(BASE_URL . '/login');
+        return;
+    }
+    include __DIR__ . '/views/client.php';
+});
+
+Flight::route('GET /admin', function() {
+    if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+        Flight::redirect(BASE_URL . '/login');
+        return;
+    }
+    include __DIR__ . '/views/admin.php';
+});
+
+Flight::route('GET /logout', function() {
+    session_destroy();
+    Flight::redirect(BASE_URL . '/login');
+});
+
+// Web service login route
+Flight::route('POST /api/login', function() {
+    $controller = new AuthController();
+    $controller->loginWS();
+});
+
+// Admin dashboard
+Flight::route('GET /admin/dashboard', function() use ($base_dir, $base_url) {
+    if (session_status() === PHP_SESSION_NONE) session_start();
+    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+        header('Location: ' . $base_url . '/login');
+        exit;
+    }
+    include $base_dir . '/views/admin/template/template.php';
+});
+
+$userController = new UserController();
+
+
+Flight::route('POST /user/ajouterFond', [$userController, 'ajouterFonds']);
+Flight::route('GET /user/formulaireFond', [$userController, 'formulaireAjoutFonds']);
+Flight::route('GET /admin/types-pret', function() {
+    $controller = new TypePretController();
+    $controller->getAllTypes();
+});
+Flight::route('GET /client/types-pret', function() {
+    if (!isset($_SESSION['user'])) {
+        Flight::redirect(BASE_URL . '/login');
+        return;
+    }
+    $controller = new TypePretController();
+    $controller->getTypesByUser($_SESSION['user']['id']);
+});
+
+>>>>>>> Stashed changes
 Flight::start();

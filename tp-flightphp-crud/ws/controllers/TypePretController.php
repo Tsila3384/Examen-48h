@@ -1,4 +1,5 @@
 <?php
+<<<<<<< Updated upstream
 require_once 'models/TypePret.php';
 
 class TypePretController
@@ -101,4 +102,35 @@ class TypePretController
             Flight::json(['error' => 'Erreur de mise à jour'], 500);
         }
     }
+=======
+
+use flight\net\Response;
+
+require 'vendor/autoload.php';
+require_once 'models/TypePret.php';
+
+// TypePretController.php
+class TypePretController {
+    private $typePretModel;
+
+    public function __construct() {
+        $this->typePretModel = new TypePret();
+    }
+
+    public function getAllTypes() {
+        $types = $this->typePretModel->findAll();
+        Flight::render('admin/template/template', [
+            'page' => 'typePret',
+            'types' => $types
+        ]);
+    }
+
+    public function getTypesByUser($userId) {
+        $types = $this->typePretModel->findAllByUser($userId);
+        Flight::render('client/template', [
+            'page' => 'typesPret',
+            'types' => $types
+        ]);
+    }
+>>>>>>> Stashed changes
 }

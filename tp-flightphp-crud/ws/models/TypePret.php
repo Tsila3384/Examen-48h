@@ -1,4 +1,5 @@
 <?php
+<<<<<<< Updated upstream
 require_once __DIR__ . '/../db.php';
 
 class TypePret
@@ -23,10 +24,27 @@ class TypePret
     public function findAll()
     {
         $stmt = $this->db->prepare("SELECT * FROM {$this->table} ORDER BY nom");
+=======
+
+require_once __DIR__ . '/../db.php';
+
+Class TypePret {
+    protected $table = 'type_pret';
+
+    protected $db;
+
+    public function __construct() {
+        $this->db = getDB();
+    }
+
+    public function findAll() {
+        $stmt = $this->db->prepare("SELECT * FROM {$this->table}");
+>>>>>>> Stashed changes
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+<<<<<<< Updated upstream
     public function findById($id)
     {
         $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE id = ?");
@@ -95,4 +113,14 @@ class TypePret
         }
         return $stmt->execute([$taux_interet, $type_pret_id, $type_client_id]);
     }
+=======
+    public function findAllByUser($id) {
+        $stmt = $this->db->prepare("SELECT tp.* FROM {$this->table} tp
+            JOIN type_client tc ON tp.id = tc.type_pret_id
+            JOIN client c ON tc.id = c.type_client_id
+            WHERE c.user_id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+>>>>>>> Stashed changes
 }
