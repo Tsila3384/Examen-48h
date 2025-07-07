@@ -54,4 +54,8 @@ Flight::route('GET /admin/dashboard', function() {
     $page = 'dashboard';
     include BASE_PATH . '/views/admin/template/template.php';
 });
+
+Flight::route('POST /user/ajouterFond', [$userController, 'ajouterFonds']);
+Flight::route('GET /user/formulaireFond', [$userController, 'formulaireAjoutFonds']);
+
 Flight::start();
