@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../db.php';
+
 class Client {
     protected $table = 'clients';
     protected $db;

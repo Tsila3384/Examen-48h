@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../db.php';
+
 class Pret
 {
     protected $db;
@@ -28,11 +30,7 @@ class Pret
 
     public function findAll()
     {
-        $stmt = $this->db->prepare("SELECT p.*, c.nom as client_nom, tp.nom as type_pret_nom, s.libelle as statut_libelle 
-                                   FROM {$this->table} p 
-                                   LEFT JOIN clients c ON p.client_id = c.id 
-                                   LEFT JOIN type_pret tp ON p.type_pret_id = tp.id 
-                                   LEFT JOIN statut s ON p.id_statut = s.id");
+        $stmt = $this->db->prepare("SELECT * FROM prets");
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

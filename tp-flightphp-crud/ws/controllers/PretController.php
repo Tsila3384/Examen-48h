@@ -13,7 +13,7 @@ class PretController
     private $pdfGenerator;
 
     public function __construct() {
-        $this->PretModel = new Pret();
+        $this->pretModel = new Pret();
         $this->clientModel = new Client();
         $this->typePretModel = new TypePret();
         $this->pdfGenerator = new PDFGenerator(); // Initialisation du générateur PDF
@@ -94,7 +94,7 @@ class PretController
         $delaiPremierRemboursement = $input['delai_premier_remboursement'] ?? 0;
 
         if ($clientId && $montant > 0 && $typePretId && $dateDebut && $duree > 0 && $tauxAssurance >= 0 && $delaiPremierRemboursement >= 0) {
-            $pretId = $this->PretModel->insererPret($clientId, $montant, $typePretId, $dateDebut, $duree, $tauxAssurance, $delaiPremierRemboursement);
+            $pretId = $this->pretModel->insererPret($clientId, $montant, $typePretId, $dateDebut, $duree, $tauxAssurance, $delaiPremierRemboursement);
             Flight::json([
                 'success' => true,
                 'message' => 'Prêt ajouté avec succès',
@@ -158,7 +158,7 @@ class PretController
     }
 
     public function rejeterPret($pretId) {
-        $result = $this->PretModel->rejeterPret($pretId);
+        $result = $this->pretModel->rejeterPret($pretId);
         if ($result) {
             Flight::json([
                 'success' => true,
@@ -198,9 +198,9 @@ class PretController
         $dateFin = Flight::request()->query['date_fin'] ?? null;
         
         if ($dateDebut && $dateFin) {
-            $interets = $this->PretModel->InteretsParMoisAnnee($dateDebut, $dateFin);
+            $interets = $this->pretModel->InteretsParMoisAnnee($dateDebut, $dateFin);
         } else {
-            $interets = $this->PretModel->InteretsParMois();
+            $interets = $this->pretModel->InteretsParMois();
         }
         
         Flight::render('admin/template/template', [
@@ -214,9 +214,9 @@ class PretController
         $dateFin = Flight::request()->query['date_fin'] ?? null;
         
         if ($dateDebut && $dateFin) {
-            $interets = $this->PretModel->InteretsParMoisAnnee($dateDebut, $dateFin);
+            $interets = $this->pretModel->InteretsParMoisAnnee($dateDebut, $dateFin);
         } else {
-            $interets = $this->PretModel->InteretsParMois();
+            $interets = $this->pretModel->InteretsParMois();
         }
         
         // Retourner les données en JSON
@@ -227,7 +227,7 @@ class PretController
     }
 
     public function getPret($pretId) {
-        $pret = $this->PretModel->findById($pretId);
+        $pret = $this->pretModel->findById($pretId);
         if ($pret) {
             Flight::json([
                 'success' => true,
