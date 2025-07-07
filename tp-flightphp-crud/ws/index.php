@@ -88,6 +88,8 @@ Flight::route('GET /client/types-pret', function() use ($typePretController) {
 
 Flight::route('GET /client/prets/formulairePret', [$pretController, 'afficherFormPret']);
 Flight::route('POST /client/pret/demandePret', [$pretController, 'demandePret']);
+Flight::route('GET /client/pret/simuler', [$pretController, 'afficherSimulationPret']);
+Flight::route('POST /client/pret/simuler', [$pretController, 'simulerPret']);
 
 // Routes pour les types de prêt (admin)
 Flight::route('GET /admin/types-pret', [$typePretController, 'getAllTypes']);

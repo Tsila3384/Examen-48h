@@ -263,18 +263,11 @@ class Pret
         $tauxMensuel = $taux / 100 / 12;
         error_log("calculerAmortissement: taux_mensuel=$tauxMensuel");
 
-        // Calcul de la mensualité selon la formule d'annuité constante
-        if ($tauxMensuel > 0) {
-            $mensualiteBase = $montant * ($tauxMensuel * pow(1 + $tauxMensuel, $duree)) / (pow(1 + $tauxMensuel, $duree) - 1);
-        } else {
-            // Si taux = 0, mensualité = montant / durée
-            $mensualiteBase = $montant / $duree;
-        }
-        
-        $assuranceMensuelle = ($montant * ($tauxAssurance / 100)) / $duree;
-        $mensualiteTotale = $mensualiteBase + $assuranceMensuelle;
+        $mensualite = round($montant * ($tauxMensuel * pow(1 + $tauxMensuel, $duree)) / (pow(1 + $tauxMensuel, $duree) - 1), 2);        
+        $assuranceMensuelle = round(($montant * ($tauxAssurance / 100)) / 12, 2);
+        $mensualiteTotale = $mensualite + $assuranceMensuelle;
 
-        error_log("calculerAmortissement: mensualite_base=$mensualiteBase, assurance_mensuelle=$assuranceMensuelle, mensualite_totale=$mensualiteTotale");
+        error_log("calculerAmortissement: mensualite_base=$mensualite, assurance_mensuelle=$assuranceMensuelle, mensualite_totale=$mensualiteTotale");
 
         $amortissement = [];
         $capitalRestant = floatval($montant);
@@ -296,7 +289,7 @@ class Pret
                 $capitalRembourse = $capitalRestant;
                 $mensualiteActuelle = $capitalRembourse + $interets + $assuranceMensuelle;
             } else {
-                $capitalRembourse = $mensualiteBase - $interets;
+                $capitalRembourse = $mensualite - $interets;
                 $mensualiteActuelle = $mensualiteTotale;
             }
             

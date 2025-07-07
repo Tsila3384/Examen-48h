@@ -105,11 +105,14 @@
 
     <nav class="sidebar" id="sidebar">
         <ul>
-            <li><a href="<?= BASE_URL ?>/client/types-pret" class="active">Type de pret disponible</a></li>
-            <li><a href="<?= BASE_URL ?>/client/dashboard" class="active">Profil</a></li>
-            <li><a href="<?= BASE_URL ?>/client/prets/formulairePret">Demandes de prêt</a></li>
+            <li><a href="<?= BASE_URL ?>/client/types-pret">Type de pret disponible</a></li>
+            <li><a href="<?= BASE_URL ?>/client/dashboard">Profil</a></li>
             <li><a href="<?= BASE_URL ?>/client/profil">Profil</a></li>
             <li><a href="<?=  BASE_URL?>/user/listePret">historiques des prets</a></li>
+            <li><a href="<?= BASE_URL ?>/client/dashboard">Dashboard</a></li>
+            <li><a href="<?= BASE_URL ?>/client/prets/formulairePret">Demandes de prêt</a></li>
+            <li><a href="<?= BASE_URL ?>/client/pret/simuler">Simuler un prêt</a></li>
+            <li><a href="<?= BASE_URL ?>/auth/deconnexion">Déconnexion</a></li>
         </ul>
     </nav>
 
