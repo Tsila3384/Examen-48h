@@ -7,7 +7,15 @@
         <input type="submit" value="Ajouter">
     </form>
 <script>
-    const apiBase = "http://localhost/S4/MrRojo/tp-flightphp-crud/tp-flightphp-crud/ws";
+    const apiBase = "<?= BASE_URL ?>";
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            ajouterFond();
+        });
+    });
+    
     function ajax(method, url, data, callback) {
         const xhr = new XMLHttpRequest();
         xhr.open(method, apiBase + url, true);
@@ -19,12 +27,13 @@
         };
         xhr.send(data);
     }
+    
     function ajouterFond() {
         const dateAjout = document.getElementById('dateAjout').value;
         const montant = document.getElementById('montant').value;
         
         const data = `dateAjout=${encodeURIComponent(dateAjout)}&montant=${encodeURIComponent(montant)}`;
-        ajax('POST', flight.base_url+'/user/ajouterFond', data, function(response) {
+        ajax('POST', '/user/ajouterFond', data, function(response) {
             if (response.success) {
                 alert(response.message || 'Fonds ajoutés avec succès');
                 // Réinitialiser le formulaire
@@ -34,11 +43,5 @@
                 alert('Erreur: ' + (response.message || 'Une erreur est survenue'));
             }
         });
-        document.addEventListener('DOMContentLoaded', function() {
-        document.querySelector('form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            ajouterFond();
-        });
-    });
     }
 </script>
