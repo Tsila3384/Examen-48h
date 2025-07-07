@@ -116,6 +116,10 @@ class User {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function getUserId() {
+        
+    }
+
     // Mettre à jour le statut d'un utilisateur
     public function updateUserStatus($id, $isActive) {
         $stmt = $this->db->prepare("UPDATE users SET is_active = ? WHERE id = ?");

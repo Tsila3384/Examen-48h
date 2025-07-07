@@ -4,6 +4,7 @@ use Flight\net\Response;
 
 require 'vendor/autoload.php';
 require_once 'models/User.php';
+require_once 'models/Client.php';
 
 class AuthController
 {
@@ -47,6 +48,7 @@ class AuthController
                 session_start();
             }
 
+            $client = new Client();
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];

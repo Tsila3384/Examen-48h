@@ -85,7 +85,7 @@ CREATE TABLE prets (
 );
 
 CREATE TABLE mensualite(
-    id PRIMARY KEY AUTO_INCREMENT,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     pret_id INT NOT NULL,
     client_id INT NOT NULL,
     montant DECIMAL(12,2),
@@ -152,3 +152,33 @@ INSERT INTO taux (type_client_id, type_pret_id, taux_interet) VALUES
 (2, 2, 5.5),  -- Entreprise, Prêt Auto
 (2, 3, 3.2);  -- Entreprise, Prêt Immobilier
 
+-- Utilisateurs clients
+INSERT INTO users (username, password, email, role) VALUES
+('client1', 'mdp1', 'client1@mail.com', 'client'),
+('client2', 'mdp2', 'client2@mail.com', 'client');
+
+
+INSERT INTO clients (nom, email, salaire, user_id, type_client_id) VALUES
+('Jean Randria', 'client1@mail.com', 850000.00, 1, 1),   -- Particulier
+('Société Ando', 'client2@mail.com', 5000000.00, 2, 2); -- Entreprise
+
+
+-- Prêt 1 : Client 1, prêt personnel, approuvé
+INSERT INTO prets (id_etablissement, client_id, type_pret_id, montant, id_statut, date_demande, duree_mois) VALUES
+(1, 5, 1, 200000.00, 2, '2025-06-01', 48);
+
+-- Prêt 2 : Client 2, prêt auto, en cours
+INSERT INTO prets (id_etablissement, client_id, type_pret_id, montant, id_statut, date_demande, duree_mois) VALUES
+(1, 2, 2, 450000.00, 4, '2025-05-15', 72);
+
+-- Prêt 3 : Client 1, prêt immobilier, en attente
+INSERT INTO prets (id_etablissement, client_id, type_pret_id, montant, id_statut, date_demande, duree_mois) VALUES
+(1, 1, 3, 1200000.00, 1, '2025-07-01', 240);
+
+-- Prêt 4 : Client 2, prêt personnel, rejeté
+INSERT INTO prets (id_etablissement, client_id, type_pret_id, montant, id_statut, date_demande, duree_mois) VALUES
+(1, 2, 1, 150000.00, 3, '2025-04-10', 36);
+
+-- Prêt 5 : Client 1, prêt auto, terminé
+INSERT INTO prets (id_etablissement, client_id, type_pret_id, montant, id_statut, date_demande, duree_mois) VALUES
+(1, 1, 2, 300000.00, 5, '2022-01-01', 60);

@@ -1,11 +1,13 @@
 <?php
 require 'vendor/autoload.php';
 require 'db.php';
-require 'controllers/UserController.php';
 require 'controllers/AuthController.php';
 require 'controllers/TypePretController.php';
 
 session_start();
+require_once('controllers/UserController.php');
+require_once('controllers/PretController.php');
+
 
 $base_url = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
 $base_url = rtrim($base_url, '/');
@@ -31,14 +33,40 @@ Flight::route('POST /auth/connexion', [$authController, 'connexion']);
 Flight::route('POST /auth/inscription', [$authController, 'inscription']);
 Flight::route('POST /auth/deconnexion', [$authController, 'deconnexion']);
 
+// Routes utilisateur (protégées)
+Flight::route('POST /user/ajouterFond', function() use ($userController, $authController) {
+    $authController->verifierRole('admin');
+    $userController->ajouterFonds();
+});
+
+Flight::route('GET /user/formulaireFond', function() use ($userController, $authController) {
+    $authController->verifierRole('admin');
+    $userController->formulaireAjoutFonds();
+});
+
+// Routes pour les prêts
+Flight::route('GET /user/listePret', function() use ($pretController) {
+    $pretController->afficherPretByUser($_SESSION['id'] );
+});
+Flight::route('/user/prets/pdf/@id', function($id){
+    $pretController = new PretController();
+    $pretController->genererPDF($id);
+});
+
+
 // Routes admin
 Flight::route('GET /admin/dashboard', function() use ($authController) {
     $authController->verifierRole('admin');
     Flight::render('admin/template/template', ['page' => 'dashboard']);
 });
+$userController = new UserController();
+$pretController = new PretController();
 
-
-
+Flight::route('POST /user/ajouterFond', [$userController, 'ajouterFonds']);
+Flight::route('GET /user/formulaireFond', [$userController, 'formulaireAjoutFonds']);
+Flight::route('GET /pret/listePret', [$pretController, 'listePrets']);
+Flight::route('POST /pret/approuverPret', [$pretController, 'approuverPret']);
+Flight::route('POST /pret/valider', [$pretController, 'validerPret']);
 // Routes client
 Flight::route('GET /client/dashboard', function() use ($authController) {
     $authController->verifierRole('client');
@@ -65,5 +93,13 @@ Flight::route('GET /', function() {
         Flight::redirect('/auth/connexion');
     }
 });
+
+Flight::route('POST /user/ajouterFond', [$userController, 'ajouterFonds']);
+Flight::route('GET /user/formulaireFond', [$userController, 'formulaireAjoutFonds']);
+Flight::route('GET /pret/listePret', [$pretController, 'listePrets']);
+Flight::route('POST /pret/approuverPret', [$pretController, 'approuverPret']);
+Flight::route('POST /pret/valider', [$pretController, 'validerPret']);
+Flight::route('GET /client/prets/formulairePret', [$pretController, 'afficherFormPret']);
+Flight::route('POST /client/pret/demandePret', [$pretController, 'demandePret']);
 
 Flight::start();
