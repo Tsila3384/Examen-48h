@@ -3,19 +3,23 @@
 require 'vendor/autoload.php';
 require_once 'models/Pret.php';
 require_once 'models/Client.php';
+require_once 'models/TypePret.php';
 
 class PretController {
     private $PretModel;
     private $clientModel;
+    private $typePretModel;
     public function __construct() {
         $this->PretModel = new Pret();
         $this->clientModel = new Client();
 
+        $this->typePretModel = new TypePret();
     }
 
     public function listePrets() {
         $prets = $this->PretModel->findAll();
         $clients = $this->clientModel->findAll();
+
         Flight::render('admin/template/template', [
             'page' => 'listePrets',
             'prets' => $prets,
@@ -23,12 +27,30 @@ class PretController {
         ]);
     }
 
-    public function validationPret() {
-        $clientId = $_POST['client_id'] ?? null;
-        $montant = $_POST['montant'] ?? null;
-        $typePretId = $_POST['type_pret_id'] ?? null;
-        $dateDebut = $_POST['date_debut'] ?? null;
-        $duree = $_POST['duree'] ?? null;
+    public function demandePret() {
+        // Récupérer les données JSON
+        $input = json_decode(file_get_contents('php://input'), true);
+            
+        // Si pas de données JSON, utiliser POST
+        if (!$input) {
+            $input = $_POST;
+        }
+        
+        $user_id = $_SESSION['user_id'] ?? null;
+        
+        if (!$user_id) {
+            Flight::json([
+                'success' => false,
+                'message' => 'Utilisateur non connecté'
+            ]);
+            return;
+        }
+        
+        $clientId = $this->clientModel->findClientByUserId($user_id);
+        $montant = $input['montant'] ?? null;
+        $typePretId = $input['type_pret_id'] ?? null;
+        $dateDebut = $input['date_debut'] ?? null;
+        $duree = $input['duree'] ?? null;
         if ($clientId && $montant && $typePretId && $dateDebut && $duree) {
             $this->PretModel->insererPret($clientId, $montant, $typePretId, $dateDebut, $duree);
             Flight::json([
@@ -86,5 +108,14 @@ class PretController {
                 'message' => 'Erreur serveur : ' . $e->getMessage()
             ]);
         }
+    }
+
+    public function afficherFormPret() {
+        $page = 'prets';
+        $typesPret = $this->typePretModel->findAll();
+        Flight::render('client/template/template', [
+            'page' => $page,
+            'typesPret' => $typesPret
+        ]);
     }
 }

@@ -108,7 +108,7 @@
             <li><a href="<?= BASE_URL ?>/client/dashboard" class="active">Dashboard</a></li>
             <li><a href="<?= BASE_URL ?>/client/transactions">Transactions</a></li>
             <li><a href="<?= BASE_URL ?>/client/transfert">Transférer des fonds</a></li>
-            <li><a href="<?= BASE_URL ?>/client/prets">Demandes de prêt</a></li>
+            <li><a href="<?= BASE_URL ?>/client/prets/formulairePret">Demandes de prêt</a></li>
             <li><a href="<?= BASE_URL ?>/client/profil">Profil</a></li>
             <li><a href="<?= BASE_URL ?>/auth/deconnexion">Déconnexion</a></li>
         </ul>
