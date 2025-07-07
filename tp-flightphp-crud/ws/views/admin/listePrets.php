@@ -25,7 +25,7 @@
                         <th>Date de Demande</th>
                         <th>Durée (mois)</th>
                         <th>Statut</th>
-                        <th>Actions</th>
+                        <th style="width: 300px;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -104,21 +104,15 @@
                             </td>
                             <td>
                                 <div class="actions">
-                                    <button class="btn btn-sm btn-secondary" onclick="voirDetails(<?= $pret['id'] ?>)" title="Voir détails">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
                                     <button class="btn btn-sm btn-warning" onclick="modifierPret(<?= $pret['id'] ?>)" title="Modifier">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-info" onclick="validerPret(<?= $pret['id'] ?>)" title="Valider">
-                                        <i class="fas fa-clipboard-check"></i>
+                                        <i class="fas fa-edit"></i> Modifier
                                     </button>
                                     <?php if ($pret['id_statut'] == 1): ?>
-                                        <button class="btn btn-sm btn-success" onclick="approuverPret(<?= $pret['id'] ?>)" title="Approuver">
-                                            <i class="fas fa-check"></i>
-                                        </button>
+                                        <button class="btn btn-sm btn-info" onclick="validerPret(<?= $pret['id'] ?>)" title="Valider">
+                                        <i class="fas fa-clipboard-check"></i> Valider
+                                    </button>
                                         <button class="btn btn-sm btn-danger" onclick="rejeterPret(<?= $pret['id'] ?>)" title="Rejeter">
-                                            <i class="fas fa-times"></i>
+                                            <i class="fas fa-times"></i> Rejeter
                                         </button>
                                     <?php endif; ?>
                                 </div>
@@ -242,9 +236,11 @@
 }
 
 .btn-sm {
-    padding: 4px 8px;
-    font-size: 12px;
+    padding: 6px 12px;
+    font-size: 13px;
     margin: 2px;
+    min-width: 80px;
+    justify-content: center;
 }
 
 .btn-secondary {
@@ -409,8 +405,19 @@
 /* Actions */
 .actions {
     display: flex;
-    gap: 4px;
+    gap: 6px;
     flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.actions .btn {
+    white-space: nowrap;
+    text-align: center;
+}
+
+.actions .btn i {
+    margin-right: 4px;
 }
 
 /* Footer du tableau */
@@ -569,6 +576,22 @@ function fermerModalPret() {
     document.getElementById('formPret').reset();
 }
 
+function rejeterPret(pretId) {
+    if (confirm('Êtes-vous sûr de vouloir rejeter ce prêt ?')) {
+        const data = JSON.stringify({
+            pret_id: pretId
+        });
+        ajax('POST', '/pret/rejeter', data, function(response) {
+            if (response.success) {
+                alert('Prêt rejeté avec succès !');
+                location.reload(); // Recharger la page pour voir les changements
+            } else {
+                alert('Erreur lors du rejet : ' + (response.message || 'Erreur inconnue'));
+            }
+        });
+    }
+}
+
 function validerPret(pretId) {
     if (confirm('Êtes-vous sûr de vouloir valider ce prêt ?')) {
         const data = JSON.stringify({
@@ -586,6 +609,4 @@ function validerPret(pretId) {
         });
     }
 }
-
-// ...existing code...
 </script>

@@ -87,4 +87,20 @@ class PretController {
             ]);
         }
     }
+
+    public function rejeterPret($pretId){
+        $result = $this->PretModel->rejeterPret($pretId);
+        if ($result) {
+            Flight::json([
+                'success' => true,
+                'message' => 'Prêt rejeté avec succès'
+            ]);
+        }
+        else {
+            Flight::json([
+                'success' => false,
+                'message' => 'Erreur lors du rejet du prêt'
+            ]);
+        }
+    }
 }

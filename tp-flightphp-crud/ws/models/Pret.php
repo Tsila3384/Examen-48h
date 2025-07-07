@@ -7,7 +7,7 @@ class Pret {
         $this->db = getDB();
     }
     public function insererPret($clientId, $montant, $typePretId, $dateDebut, $duree) {
-        $stmt = $this->db->prepare("INSERT INTO {$this->table} (client_id, montant, type_pret_id, date_debut, duree, id_statut) VALUES (?, ?, ?, ?, ?, 2)");
+        $stmt = $this->db->prepare("INSERT INTO {$this->table} (id_etablissement, client_id, montant, type_pret_id, date_demande, duree_mois, id_statut) VALUES (1, ?, ?, ?, ?, ?, 1)");
         $stmt->execute([$clientId, $montant, $typePretId, $dateDebut, $duree]);
         $taux = $this->recupererTaux($clientId, $typePretId);
         $montantTotal = $montant + ($montant * $taux / 100);
@@ -50,8 +50,8 @@ class Pret {
             $clientId = $pret['client_id'];
             $montant = $pret['montant'];
             $typePretId = $pret['type_pret_id'];
-            $dateDebut = $pret['date_debut'];
-            $duree = $pret['duree'];
+            $dateDebut = $pret['date_demande']; // Correction : date_demande au lieu de date_debut
+            $duree = $pret['duree_mois']; // Correction : duree_mois au lieu de duree
 
             // Calculate payment details
             $taux = $this->recupererTaux($clientId, $typePretId);
@@ -79,6 +79,12 @@ class Pret {
         $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE id = ?");
         $stmt->execute([$id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function rejeterPret($pretId) {
+        $stmt = $this->db->prepare("UPDATE {$this->table} SET id_statut = 3 WHERE id = ?");
+        $stmt->execute([$pretId]);
+        return $stmt->rowCount() > 0;
     }
 
 }

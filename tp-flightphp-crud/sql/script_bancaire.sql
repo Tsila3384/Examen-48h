@@ -85,7 +85,7 @@ CREATE TABLE prets (
 );
 
 CREATE TABLE mensualite(
-    id PRIMARY KEY AUTO_INCREMENT,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     pret_id INT NOT NULL,
     client_id INT NOT NULL,
     montant DECIMAL(12,2),
