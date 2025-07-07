@@ -20,6 +20,9 @@ define('BASE_URL', $base_url === '' ? '' : $base_url);
 
 $authController = new AuthController();
 $typePretController = new TypePretController();
+$pretController = new PretController();
+$userController = new UserController();
+
 
 // Routes publiques
 Flight::route('GET /auth/connexion', [$authController, 'afficherConnexion']);
