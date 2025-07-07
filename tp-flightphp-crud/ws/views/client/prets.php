@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -110,6 +111,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -140,6 +142,14 @@
                 <label for="duree">Durée (en mois)</label>
                 <input type="number" id="duree" name="duree" min="6" max="360" step="1" required>
             </div>
+            <div class="form-group">
+                <label for="taux_assurance">Taux d'assurance (%)</label>
+                <input type="number" id="taux_assurance" name="taux_assurance" min="0" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="delai_premier_remboursement">Délai premier remboursement (mois)</label>
+                <input type="number" id="delai_premier_remboursement" name="delai_premier_remboursement" min="0" step="1" required>
+            </div>
             <input type="hidden" name="client_id" value="<?= htmlspecialchars($_SESSION['user_id'] ?? '') ?>">
             <button type="submit" class="btn">Soumettre la demande</button>
         </form>
@@ -160,11 +170,11 @@
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const formData = new FormData(form);
             const data = Object.fromEntries(formData);
 
-            // Client-side validation
+            // Validation côté client
             if (data.montant < 1000) {
                 showAlert('Le montant doit être d\'au moins 1000€', 'error');
                 return;
@@ -176,6 +186,14 @@
             const today = new Date().toISOString().split('T')[0];
             if (data.date_debut < today) {
                 showAlert('La date de début ne peut pas être antérieure à aujourd\'hui', 'error');
+                return;
+            }
+            if (data.taux_assurance < 0) {
+                showAlert('Le taux d\'assurance ne peut pas être négatif', 'error');
+                return;
+            }
+            if (data.delai_premier_remboursement < 0) {
+                showAlert('Le délai de premier remboursement ne peut pas être négatif', 'error');
                 return;
             }
 
@@ -204,4 +222,5 @@
         });
     </script>
 </body>
+
 </html>
