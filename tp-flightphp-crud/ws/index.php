@@ -8,6 +8,11 @@ session_start();
 require_once('controllers/UserController.php');
 require_once('controllers/PretController.php');
 
+$authController = new AuthController();
+$typePretController = new TypePretController();
+$userController = new UserController();
+$pretController = new PretController();
+
 
 $base_url = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
 $base_url = rtrim($base_url, '/');
