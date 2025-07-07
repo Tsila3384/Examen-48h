@@ -1,16 +1,13 @@
 <?php
-require_once('controllers/UserController.php');
-require_once('controllers/PretController.php');
 require 'vendor/autoload.php';
 require 'db.php';
 require 'controllers/AuthController.php';
 
 // Démarrer la session
 session_start();
-=========
 require_once('controllers/UserController.php');
 require_once('controllers/PretController.php');
->>>>>>>>> Temporary merge branch 2
+
 
 $base_url = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
 $base_url = rtrim($base_url, '/');
