@@ -35,6 +35,17 @@
 
     <!-- Contenu dynamique -->
     <div id="tableau-content">
+    </div>
+
+    <!-- Section graphique -->
+    <div id="graphique-section" class="chart-section" style="display: none;">
+        <div class="chart-header">
+            <h3>Évolution des Intérêts par Mois</h3>
+        </div>
+        <div class="chart-container">
+            <canvas id="interetsChart" width="400" height="200"></canvas>
+        </div>
+    </div>
 </div>
 
 <style>
@@ -462,10 +473,50 @@
         padding: 8px 4px;
     }
 }
+
+/* Styles pour le graphique */
+.chart-section {
+    margin-top: 30px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.chart-header h3 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.chart-container {
+    padding: 20px;
+    position: relative;
+    height: 400px;
+}
+
+.chart-container canvas {
+    max-height: 100%;
+    width: 100% !important;
+    height: auto !important;
+}
 </style>
 
 <script>
 const apiBase = "http://localhost<?= BASE_URL ?>";
+
+// Variables globales pour le graphique
+let interetsChart = null;
 
 function ajax(method, url, data, callback) {
     const xhr = new XMLHttpRequest();
@@ -499,14 +550,111 @@ function formatNumber(number, decimales = 2) {
     }).format(number);
 }
 
+function creerGraphique(donnees) {
+    const ctx = document.getElementById('interetsChart').getContext('2d');
+    
+    // Détruire le graphique existant s'il existe
+    if (interetsChart) {
+        interetsChart.destroy();
+    }
+    
+    // Préparer les données
+    const labels = donnees.map(item => {
+        const [annee, mois] = item.AnneeMois.split('-');
+        const date = new Date(annee, mois - 1);
+        return date.toLocaleDateString('fr-FR', { 
+            year: 'numeric', 
+            month: 'short' 
+        });
+    });
+    
+    const valeurs = donnees.map(item => parseFloat(item.total_mensualites));
+    
+    // Configuration du graphique
+    const config = {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Montant des Intérêts (Ar)',
+                data: valeurs,
+                backgroundColor: 'rgba(40, 167, 69, 0.8)',
+                borderColor: 'rgba(40, 167, 69, 1)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Évolution des Revenus d\'Intérêts par Mois',
+                    font: {
+                        size: 16,
+                        weight: 'bold'
+                    }
+                },
+                legend: {
+                    display: true,
+                    position: 'top'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + 
+                                   formatNumber(context.parsed.y) + ' Ar';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Montant (Ar)'
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return formatNumber(value, 0) + ' Ar';
+                        }
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Période'
+                    }
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuart'
+            }
+        }
+    };
+    
+    interetsChart = new Chart(ctx, config);
+    
+    // Afficher la section graphique
+    document.getElementById('graphique-section').style.display = 'block';
+}
+
 function genererContenuTableau(interets) {
     if (!interets || interets.length === 0) {
+        // Cacher le graphique si pas de données
+        document.getElementById('graphique-section').style.display = 'none';
+        
         return `<div class="empty-state">
             <i class="fas fa-chart-line"></i>
             <h3>Aucun intérêt trouvé</h3>
             <p>Il n'y a aucune mensualité enregistrée pour la période sélectionnée.</p>
         </div>`;
     }
+
+    // Créer le graphique avec les nouvelles données
+    creerGraphique(interets);
 
     // Calculer les totaux
     let totalGeneral = 0;
@@ -554,7 +702,6 @@ function genererContenuTableau(interets) {
                 <tr>
                     <th>Période (Année-Mois)</th>
                     <th>Total des Mensualités</th>
-                    <th>Pourcentage du Total</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -568,12 +715,6 @@ function genererContenuTableau(interets) {
             </td>
             <td>
                 <span class="montant">${formatNumber(parseFloat(interet.total_mensualites))} Ar</span>
-            </td>
-            <td>
-                <div class="percentage-bar">
-                    <div class="percentage-fill" style="width: ${pourcentage}%"></div>
-                    <span class="percentage-text">${formatNumber(pourcentage, 1)}%</span>
-                </div>
             </td>
             <td>
                 <div class="actions">
@@ -593,7 +734,6 @@ function genererContenuTableau(interets) {
                 <tr class="total-row">
                     <td><strong>TOTAL GÉNÉRAL</strong></td>
                     <td><strong>${formatNumber(totalGeneral)} Ar</strong></td>
-                    <td><strong>100%</strong></td>
                     <td>
                         <button class="btn btn-sm btn-success" onclick="exporterTout()" title="Exporter tout">
                             <i class="fas fa-file-excel"></i> Export Global
@@ -666,8 +806,23 @@ function exporterTout() {
 
 // Charger les données initiales au chargement de la page
 document.addEventListener('DOMContentLoaded', function() {
-    const dateDebut = document.getElementById('date_debut').value;
-    const dateFin = document.getElementById('date_fin').value;
-    chargerDonnees(dateDebut, dateFin);
+    // Charger Chart.js depuis CDN
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+    script.onload = function() {
+        console.log('Chart.js chargé avec succès');
+        // Charger les données une fois Chart.js disponible
+        const dateDebut = document.getElementById('date_debut').value;
+        const dateFin = document.getElementById('date_fin').value;
+        chargerDonnees(dateDebut, dateFin);
+    };
+    script.onerror = function() {
+        console.error('Erreur lors du chargement de Chart.js');
+        // Charger quand même les données sans graphique
+        const dateDebut = document.getElementById('date_debut').value;
+        const dateFin = document.getElementById('date_fin').value;
+        chargerDonnees(dateDebut, dateFin);
+    };
+    document.head.appendChild(script);
 });
 </script>
