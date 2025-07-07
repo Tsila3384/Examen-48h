@@ -1,5 +1,4 @@
 <?php
-
 require 'vendor/autoload.php';
 require_once 'models/Pret.php';
 require_once 'models/Client.php';
@@ -13,9 +12,8 @@ class PretController
     private $typePretModel;
     private $pdfGenerator;
 
-    public function __construct()
-    {
-        $this->pretModel = new Pret();
+    public function __construct() {
+        $this->PretModel = new Pret();
         $this->clientModel = new Client();
         $this->typePretModel = new TypePret();
         $this->pdfGenerator = new PDFGenerator(); // Initialisation du générateur PDF
@@ -71,6 +69,7 @@ class PretController
 
     public function demandePret()
     {
+
         $input = json_decode(file_get_contents('php://input'), true);
         if (!$input) {
             $input = $_POST;
@@ -91,19 +90,20 @@ class PretController
         $typePretId = $input['type_pret_id'] ?? null;
         $dateDebut = $input['date_debut'] ?? null;
         $duree = $input['duree'] ?? null;
+        $tauxAssurance = $input['taux_assurance'] ?? 0;
+        $delaiPremierRemboursement = $input['delai_premier_remboursement'] ?? 0;
 
-        if ($clientId && $montant && $typePretId && $dateDebut && $duree) {
-            $pretId = $this->pretModel->insererPret($clientId, $montant, $typePretId, $dateDebut, $duree);
-
+        if ($clientId && $montant > 0 && $typePretId && $dateDebut && $duree > 0 && $tauxAssurance >= 0 && $delaiPremierRemboursement >= 0) {
+            $pretId = $this->PretModel->insererPret($clientId, $montant, $typePretId, $dateDebut, $duree, $tauxAssurance, $delaiPremierRemboursement);
             Flight::json([
                 'success' => true,
                 'message' => 'Prêt ajouté avec succès',
-                'pret_id' => $pretId // Retourne l'ID du prêt créé
+                'pret_id' => $pretId
             ]);
         } else {
             Flight::json([
                 'success' => false,
-                'message' => 'Tous les champs sont obligatoires'
+                'message' => 'Données invalides ou incomplètes'
             ]);
         }
     }
@@ -124,8 +124,7 @@ class PretController
         }
     }
 
-    public function validerPret()
-    {
+    public function validerPret() {
         $input = json_decode(file_get_contents('php://input'), true);
         $pretId = $input['pret_id'] ?? null;
 
@@ -158,9 +157,8 @@ class PretController
         }
     }
 
-    public function rejeterPret($pretId)
-    {
-        $result = $this->pretModel->rejeterPret($pretId);
+    public function rejeterPret($pretId) {
+        $result = $this->PretModel->rejeterPret($pretId);
         if ($result) {
             Flight::json([
                 'success' => true,
@@ -186,11 +184,60 @@ class PretController
 
     public function afficherFormPret()
     {
+
         $page = 'prets';
         $typesPret = $this->typePretModel->findAll();
         Flight::render('client/template/template', [
             'page' => $page,
             'typesPret' => $typesPret
         ]);
+    }
+
+    public function afficherListeInteretsParMois() {
+        $dateDebut = Flight::request()->query['date_debut'] ?? null;
+        $dateFin = Flight::request()->query['date_fin'] ?? null;
+        
+        if ($dateDebut && $dateFin) {
+            $interets = $this->PretModel->InteretsParMoisAnnee($dateDebut, $dateFin);
+        } else {
+            $interets = $this->PretModel->InteretsParMois();
+        }
+        
+        Flight::render('admin/template/template', [
+            'page' => 'tableauInterets',
+            'interets' => $interets
+        ]);
+    }
+
+    public function afficherListeInteretsParMoisAjax() {
+        $dateDebut = Flight::request()->query['date_debut'] ?? null;
+        $dateFin = Flight::request()->query['date_fin'] ?? null;
+        
+        if ($dateDebut && $dateFin) {
+            $interets = $this->PretModel->InteretsParMoisAnnee($dateDebut, $dateFin);
+        } else {
+            $interets = $this->PretModel->InteretsParMois();
+        }
+        
+        // Retourner les données en JSON
+        Flight::json([
+            'success' => true,
+            'data' => $interets
+        ]);
+    }
+
+    public function getPret($pretId) {
+        $pret = $this->PretModel->findById($pretId);
+        if ($pret) {
+            Flight::json([
+                'success' => true,
+                'data' => $pret
+            ]);
+        } else {
+            Flight::json([
+                'success' => false,
+                'message' => 'Prêt introuvable'
+            ]);
+        }
     }
 }
