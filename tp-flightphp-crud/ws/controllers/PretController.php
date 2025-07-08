@@ -78,23 +78,12 @@ class PretController
 
     public function demandePret()
     {
-
         $input = json_decode(file_get_contents('php://input'), true);
         if (!$input) {
             $input = $_POST;
         }
 
-        $user_id = $_SESSION['user_id'] ?? null;
-
-        if (!$user_id) {
-            Flight::json([
-                'success' => false,
-                'message' => 'Utilisateur non connecté'
-            ]);
-            return;
-        }
-
-        $clientId = $this->clientModel->findClientByUserId($user_id);
+        $clientId = $input['client_id'] ?? null;
         $montant = $input['montant'] ?? null;
         $typePretId = $input['type_pret_id'] ?? null;
         $dateDebut = $input['date_debut'] ?? null;
@@ -102,24 +91,36 @@ class PretController
         $tauxAssurance = $input['taux_assurance'] ?? 0;
         $delaiPremierRemboursement = $input['delai_premier_remboursement'] ?? 0;
 
-        if ($clientId && $montant > 0 && $typePretId && $dateDebut && $duree > 0 && $tauxAssurance >= 0 && $delaiPremierRemboursement >= 0) {
-            try {
-                $pretId = $this->pretModel->insererPret($clientId, $montant, $typePretId, $dateDebut, $duree, $tauxAssurance, $delaiPremierRemboursement);
-                Flight::json([
-                    'success' => true,
-                    'message' => 'Prêt ajouté avec succès',
-                    'pret_id' => $pretId
-                ]);
-            } catch (Exception $e) {
-                Flight::json([
-                    'success' => false,
-                    'message' => $e->getMessage()
-                ]);
-            }
-        } else {
+        // Validation des données
+        if (!$clientId || $montant <= 0 || !$typePretId || !$dateDebut || $duree <= 0 || $tauxAssurance < 0 || $delaiPremierRemboursement < 0) {
             Flight::json([
                 'success' => false,
                 'message' => 'Données invalides ou incomplètes'
+            ]);
+            return;
+        }
+
+        // Vérifier que le client existe
+        $client = $this->clientModel->findById($clientId);
+        if (!$client) {
+            Flight::json([
+                'success' => false,
+                'message' => 'Client introuvable'
+            ]);
+            return;
+        }
+
+        try {
+            $pretId = $this->pretModel->insererPret($clientId, $montant, $typePretId, $dateDebut, $duree, $tauxAssurance, $delaiPremierRemboursement);
+            Flight::json([
+                'success' => true,
+                'message' => 'Prêt ajouté avec succès',
+                'pret_id' => $pretId
+            ]);
+        } catch (Exception $e) {
+            Flight::json([
+                'success' => false,
+                'message' => $e->getMessage()
             ]);
         }
     }
@@ -224,10 +225,24 @@ class PretController
     {
 
         $page = 'prets';
+        $clients = $this->clientModel->findAll();
         $typesPret = $this->typePretModel->findAll();
         Flight::render('client/template/template', [
             'page' => $page,
-            'typesPret' => $typesPret
+            'typesPret' => $typesPret,
+            'clients' => $clients
+        ]);
+    }
+
+    public function afficherFormDemandePretAdmin()
+    {
+        $this->authController->verifierRole('admin');
+        $clients = $this->clientModel->findAll();
+        $typesPret = $this->typePretModel->findAll();
+        Flight::render('admin/template/template', [
+            'page' => 'demandePret',
+            'typesPret' => $typesPret,
+            'clients' => $clients
         ]);
     }
 

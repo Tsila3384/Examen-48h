@@ -1,3 +1,6 @@
+    <a href="<?= BASE_URL ?>/admin/prets/nouveau" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Nouvelle Demande
+    </a>
 <div class="content-header">
     <h2>Liste des Prêts</h2>
 </div>

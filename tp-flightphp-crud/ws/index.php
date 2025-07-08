@@ -114,6 +114,10 @@ Flight::route('GET /admin/types-pret/edit/@id', [$typePretController, 'edit']);
 Flight::route('POST /admin/types-pret/update/@id', [$typePretController, 'update']);
 Flight::route('POST /admin/types-pret/delete/@id', [$typePretController, 'destroy']);
 
+// Routes pour la demande de prêt (admin)
+Flight::route('GET /admin/prets/nouveau', [$pretController, 'afficherFormDemandePretAdmin']);
+Flight::route('POST /admin/prets/nouveau', [$pretController, 'demandePret']);
+
 // Routes pour la gestion des fonds
 Flight::route('POST /user/ajouterFond', [$userController, 'ajouterFonds']);
 Flight::route('GET /user/formulaireFond', [$userController, 'formulaireAjoutFonds']);

@@ -37,9 +37,13 @@
                 <i class="icon fas fa-plus-circle"></i>
                 <span>Ajouter Fonds</span>
             </a></li>
+            <li><a href="<?= BASE_URL ?>/admin/prets/nouveau" class="menu-item">
+                <i class="icon fas fa-plus"></i>
+                <span>Nouvelle Demande</span>
+            </a></li>
             <li><a href="<?= BASE_URL ?>/pret/listePret" class="menu-item">
-                <i class="icon fas fa-clipboard-list"></i>
-                <span>Gestion Prêts</span>
+                <i class="icon fas fa-list"></i>
+                <span>Liste des Prêts</span>
             </a></li>
             <li><a href="<?= BASE_URL ?>/admin/types-pret" class="menu-item">
                 <i class="icon fas fa-tags"></i>
@@ -294,9 +298,10 @@
         }
     <nav class="sidebar" id="sidebar">
         <ul>
-            <li><a href="#" class="active">Dashboard</a></li>
+            <li><a href="<?= BASE_URL ?>/admin/dashboard" class="active">Dashboard</a></li>
             <li><a href="<?= BASE_URL ?>/user/formulaireFond">Ajouter Fonds</a></li>
-            <li><a href="<?= BASE_URL ?>/pret/listePret">Gestion Prêts</a></li>
+            <li><a href="<?= BASE_URL ?>/admin/prets">Gestion Prêts</a></li>
+            <li><a href="<?= BASE_URL ?>/admin/prets/simuler">Simulateur Prêt</a></li>
             <li><a href="<?= BASE_URL ?>/admin/types-pret">Type de prêt</a></li>
             <li><a href="<?= BASE_URL ?>/admin/taux">Gestion Taux</a></li>
             <li><a href="<?= BASE_URL ?>/admin/interets">Tableau et Graphe</a></li>
