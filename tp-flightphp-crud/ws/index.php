@@ -76,6 +76,7 @@ Flight::route('GET /user/formulaireFond', [$userController, 'formulaireAjoutFond
 Flight::route('GET /pret/listePret', [$pretController, 'listePrets']);
 Flight::route('POST /pret/approuverPret', [$pretController, 'approuverPret']);
 Flight::route('POST /pret/valider', [$pretController, 'validerPret']);
+Flight::route('POST /pret/rejeter', [$pretController, 'rejeterPret']);
 // Route par défaut - doit être définie avant les autres routes
 Flight::route('GET /', function() {
     if (isset($_SESSION['user'])) {

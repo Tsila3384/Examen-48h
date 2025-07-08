@@ -50,16 +50,24 @@
                                 </span>
                             </td>
                             <td>
-                                    <a href="<?= BASE_URL ?>/user/pret/details/<?= $pret['id'] ?>"
-                                        class="btn btn-sm btn-primary">Détails</a>
-                                    <a href="<?= BASE_URL ?>/user/prets/pdf/<?= $pret['id'] ?>"
-                                        class="btn btn-sm btn-warning"
+
+                                <span class="date">
+                                    <?= isset($pret['date_demande']) ? date('d/m/Y', strtotime($pret['date_demande'])) : 'N/A' ?>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="duration">
+                                    <?= isset($pret['duree_mois']) ? htmlspecialchars($pret['duree_mois']) : 'N/A' ?> mois
+                                </span>
+                            </td>
+                            <td>
+                                <div class="actions-group">
+                                    <a href="<?= BASE_URL ?>/user/prets/pdf/<?= $pret['id'] ?>" class="btn btn-sm btn-warning"
                                         title="Générer le PDF du prêt">
                                         <i class="fas fa-file-pdf"></i> PDF
                                     </a>
-                                    <a href="<?= BASE_URL ?>/user/prets/details/<?= $pret['id'] ?>"
-                                        class="btn btn-sm btn-primary"
-                                        title="Voir les détails">
+                                    <a href="<?= BASE_URL ?>/user/pret/details/<?= $pret['id'] ?>"
+                                        class="btn btn-sm btn-primary" title="Voir les détails">
                                         <i class="fas fa-eye"></i> Détails
                                     </a>
                                 </div>

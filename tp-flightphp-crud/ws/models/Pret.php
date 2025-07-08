@@ -13,6 +13,24 @@ class Pret
 
     public function insererPret($clientId, $montant, $typePretId, $dateDebut, $duree, $tauxAssurance, $delaiPremierRemboursement)
     {
+        // Vérifier les fonds disponibles de l'établissement avant l'insertion
+        $stmtFonds = $this->db->prepare("SELECT fonds_disponibles FROM etablissement WHERE id = 1");
+        $stmtFonds->execute();
+        $etablissement = $stmtFonds->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$etablissement) {
+            throw new Exception("Établissement introuvable");
+        }
+        
+        $fondsDisponibles = floatval($etablissement['fonds_disponibles']);
+        $montantDemande = floatval($montant);
+        
+        if ($fondsDisponibles < $montantDemande) {
+            throw new Exception("Fonds insuffisants dans l'établissement.");
+        }
+        
+        error_log("insererPret: Vérification des fonds OK - Fonds disponibles: $fondsDisponibles €, Montant demandé: $montantDemande €");
+        
         $stmt = $this->db->prepare("INSERT INTO {$this->table} (id_etablissement, client_id, montant, type_pret_id, date_demande, duree_mois, id_statut, taux_assurance, delai_premier_remboursement) VALUES (1, ?, ?, ?, ?, ?, 1, ?, ?)");
         $stmt->execute([$clientId, $montant, $typePretId, $dateDebut, $duree, $tauxAssurance, $delaiPremierRemboursement]);
         return $this->db->lastInsertId();
