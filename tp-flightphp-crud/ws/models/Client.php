@@ -42,4 +42,12 @@ class Client {
             return false;
         }
     }
+
+    public function getTypeClientId($clientId)
+{
+    $stmt = $this->db->prepare("SELECT type_client_id FROM {$this->table} WHERE id = ?");
+    $stmt->execute([$clientId]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $result ? $result['type_client_id'] : null;
+}
 }

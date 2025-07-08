@@ -96,4 +96,16 @@ class TypePret
         }
         return $stmt->execute([$taux_interet, $type_pret_id, $type_client_id]);
     }
+
+    public function findAllWithTaux()
+{
+    $stmt = $this->db->prepare("
+        SELECT tp.id, tp.nom, tp.duree_max, t.type_client_id, t.taux_interet
+        FROM {$this->table} tp
+        LEFT JOIN taux t ON tp.id = t.type_pret_id
+        ORDER BY tp.nom, t.type_client_id
+    ");
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 }

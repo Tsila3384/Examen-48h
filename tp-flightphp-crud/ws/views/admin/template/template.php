@@ -55,6 +55,10 @@
                     <i class="icon fas fa-tags"></i>
                     <span>Types de prêt</span>
                 </a></li>
+                 <li><a href="<?= BASE_URL ?>/admin/fonds" class="menu-item">
+                    <i class="icon fas fa-wallet"></i>
+                    <span>Fonds Disponibles</span>
+                </a></li>
             <li><a href="<?= BASE_URL ?>/admin/taux" class="menu-item">
                     <i class="icon fas fa-percent"></i>
                     <span>Taux d'intérêt</span>
@@ -63,13 +67,16 @@
                     <i class="icon fas fa-chart-bar"></i>
                     <span>Tableau et Graphe</span>
                 </a></li>
-            <li><a href="<?= BASE_URL ?>/admin/fonds" class="menu-item">
-                    <i class="icon fas fa-wallet"></i>
-                    <span>Fonds Disponibles</span>
-                </a></li>
+           
             <li><a href="<?= BASE_URL ?>/client/simulations" class="menu-item">
                     <i class="icon fas fa-list"></i>
                     <span>Mes simulations</span>
+            </a></li>
+            <li><a href="<?= BASE_URL ?>/admin/prets/simulations" class="menu-item">
+                <i class="icon fas fa-list-alt"></i>
+                <span>Liste des Simulations</span>
+            </a></li>
+            
             <li><a href="<?= BASE_URL ?>/auth/deconnexion" class="menu-item logout">
                     <i class="icon fas fa-sign-out-alt"></i>
                     <span>Déconnexion</span>
