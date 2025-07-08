@@ -188,7 +188,7 @@
             </div>
 
             <div class="form-group">
-                <label for="salaire">Salaire mensuel (€)</label>
+                <label for="salaire">Salaire mensuel (Ar)</label>
                 <input type="number" id="salaire" name="salaire" min="0" step="0.01" required>
             </div>
 

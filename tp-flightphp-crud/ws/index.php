@@ -29,8 +29,8 @@ Flight::route('GET /auth/connexion', [$authController, 'afficherConnexion']);
 Flight::route('GET /auth/inscription', [$authController, 'afficherInscription']);
 Flight::route('POST /auth/connexion', [$authController, 'connexion']);
 Flight::route('POST /auth/inscription', [$authController, 'inscription']);
-Flight::route('POST /auth/deconnexion', [$authController, 'deconnexion']);
-
+Flight::route('GET /auth/deconnexion', [$authController, 'deconnexion']);
+Flight::route('POST /auth/deconnexion', [$authController, 'deco']);
 // Routes utilisateur (protégées)
 Flight::route('POST /user/ajouterFond', function() use ($userController, $authController) {
     $authController->verifierRole('admin');

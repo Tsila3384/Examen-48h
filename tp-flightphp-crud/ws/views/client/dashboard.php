@@ -1,168 +1,144 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tableau de bord - Client</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<div class="dashboard-container">
+    <!-- Alert -->
+    <div id="alert" class="alert" style="display: none;"></div>
 
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .container {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 600px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            color: #333;
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            color: #666;
-            font-size: 16px;
-        }
-
-        .info-section {
-            margin-bottom: 30px;
-        }
-
-        .info-section h2 {
-            color: #333;
-            font-size: 20px;
-            margin-bottom: 15px;
-        }
-
-        .info-section p {
-            color: #666;
-            font-size: 16px;
-            margin-bottom: 10px;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .alert {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .alert.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Bienvenue, <?= htmlspecialchars($_SESSION['username'] ?? 'Client') ?> !</h1>
-            <p>Votre tableau de bord bancaire</p>
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+        <div class="welcome-card">
+            <div class="welcome-header">
+                <h1>Bienvenue dans votre espace client</h1>
+                <p class="welcome-subtitle">Gérez vos prêts en toute simplicité</p>
+            </div>
+            <div class="user-info-grid">
+                <div class="info-item">
+                    <div class="info-icon">👤</div>
+                    <div class="info-content">
+                        <span class="info-label">Nom d'utilisateur</span>
+                        <span class="info-value"><?= htmlspecialchars($_SESSION['username'] ?? 'N/A') ?></span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">🏷️</div>
+                    <div class="info-content">
+                        <span class="info-label">Rôle</span>
+                        <span class="info-value role-badge"><?= htmlspecialchars($_SESSION['role'] ?? 'N/A') ?></span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">🕒</div>
+                    <div class="info-content">
+                        <span class="info-label">Dernière connexion</span>
+                        <span class="info-value">Aujourd'hui</span>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon">✅</div>
+                    <div class="info-content">
+                        <span class="info-label">Statut du compte</span>
+                        <span class="info-value status-active">Actif</span>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div id="alert" class="alert"></div>
-
-        <div class="info-section">
-            <h2>Vos informations</h2>
-            <p><strong>Nom d'utilisateur :</strong> <?= htmlspecialchars($_SESSION['username'] ?? 'N/A') ?></p>
-            <p><strong>Rôle :</strong> <?= htmlspecialchars($_SESSION['role'] ?? 'N/A') ?></p>
-            <!-- Placeholder for additional user data -->
-            <p><strong>Compte :</strong> Solde non disponible (fonctionnalité à venir)</p>
-        </div>
-
-        <form id="logoutForm" action="<?= BASE_URL ?>/auth/deconnexion" method="POST">
-            <button type="submit" class="btn">Se déconnecter</button>
-        </form>
     </div>
 
-    <script>
-        const form = document.getElementById('logoutForm');
-        const alert = document.getElementById('alert');
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <h2>Actions rapides</h2>
+        <div class="actions-grid">
+            <a href="<?= BASE_URL ?>/client/prets/formulairePret" class="action-card">
+                <div class="action-icon">📝</div>
+                <h3>Nouvelle demande</h3>
+                <p>Faire une demande de prêt</p>
+            </a>
+            <a href="<?= BASE_URL ?>/client/pret/simuler" class="action-card">
+                <div class="action-icon">🧮</div>
+                <h3>Simuler un prêt</h3>
+                <p>Calculer vos mensualités</p>
+            </a>
+            <a href="<?= BASE_URL ?>/user/listePret" class="action-card">
+                <div class="action-icon">📚</div>
+                <h3>Mes prêts</h3>
+                <p>Consulter l'historique</p>
+            </a>
+            <a href="<?= BASE_URL ?>/client/types-pret" class="action-card">
+                <div class="action-icon">📋</div>
+                <h3>Types de prêts</h3>
+                <p>Découvrir nos offres</p>
+            </a>
+        </div>
+    </div>
 
-        function showAlert(message, type) {
-            alert.textContent = message;
-            alert.className = `alert ${type}`;
-            alert.style.display = 'block';
-            setTimeout(() => {
-                alert.style.display = 'none';
-            }, 5000);
-        }
+    <!-- Logout Section -->
+    <div class="logout-section">
+        <form id="logoutForm" action="<?= BASE_URL ?>/auth/deconnexion" method="POST">
+            <button type="submit" class="btn-logout">
+                <span class="logout-icon">🚪</span>
+                Se déconnecter
+            </button>
+        </form>
+    </div>
+</div>
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            try {
-                const response = await fetch('<?= BASE_URL ?>/auth/deconnexion', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    showAlert(data.message, 'success');
-                    setTimeout(() => {
-                        window.location.href = data.redirect;
-                    }, 1000);
-                } else {
-                    showAlert(data.message, 'error');
+<script>
+    const form = document.getElementById('logoutForm');
+    const alert = document.getElementById('alert');
+
+    function showAlert(message, type) {
+        alert.textContent = message;
+        alert.className = `alert alert-${type}`;
+        alert.style.display = 'block';
+        setTimeout(() => {
+            alert.style.display = 'none';
+        }, 5000);
+    }
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        try {
+            const response = await fetch('<?= BASE_URL ?>/auth/deconnexion', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
                 }
-            } catch (error) {
-                showAlert('Erreur de connexion au serveur', 'error');
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showAlert(data.message, 'success');
+                setTimeout(() => {
+                    window.location.href = data.redirect;
+                }, 1000);
+            } else {
+                showAlert(data.message, 'danger');
+            }
+        } catch (error) {
+            showAlert('Erreur de connexion au serveur', 'danger');
+        }
+    });
+
+    // Animation au scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
             }
         });
-    </script>
-</body>
-</html>
+    }, observerOptions);
+
+    document.querySelectorAll('.welcome-section, .quick-actions, .statistics-section, .recent-activity').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(el);
+    });
+</script>
+<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/dashboard.css">
