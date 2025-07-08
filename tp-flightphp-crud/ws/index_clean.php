@@ -97,7 +97,7 @@ Flight::route('GET /user/formulaireFond', function() use ($userController, $auth
 
 // Routes Admin - Gestion des prêts
 Flight::route('GET /admin/prets', [$pretController, 'listePrets']);
-Flight::route('GET /admin/prets/nouveau', [$pretController, 'afficherFormDemandePretAdmin']);
+Flight::route('GET /admin/prets/nouveau', [$pretController, 'afficherFormDemandePret']);
 Flight::route('POST /admin/prets/nouveau', [$pretController, 'demandePret']);
 Flight::route('GET /admin/prets/details/@id', [$pretController, 'getDetailsPret']);
 Flight::route('GET /admin/prets/pdf/@id', [$pretController, 'genererPDF']);
@@ -125,9 +125,5 @@ Flight::route('POST /admin/taux/supprimer', [$tauxController, 'supprimerTaux']);
 // Routes Admin - Rapports et intérêts
 Flight::route('GET /admin/interets', [$pretController, 'afficherListeInteretsParMois']);
 Flight::route('GET /admin/interets/ajax', [$pretController, 'afficherListeInteretsParMoisAjax']);
-
-// Routes Admin - Tableau des fonds
-Flight::route('GET /admin/fonds', [$pretController, 'afficherFondsDisponibles']);
-Flight::route('GET /admin/fonds/ajax', [$pretController, 'afficherFondsDisponiblesAjax']);
 
 Flight::start();
