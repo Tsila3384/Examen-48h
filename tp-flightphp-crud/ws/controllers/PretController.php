@@ -302,7 +302,7 @@ class PretController
     public function afficherSimulationPret()
     {
         $pages = 'simulationPret';
-        Flight::render('client/template/template', [
+        Flight::render('admin/template/template', [
             'page' => $pages
         ]);
     }
