@@ -7,6 +7,7 @@ require 'controllers/TypePretController.php';
 session_start();
 require_once('controllers/UserController.php');
 require_once('controllers/PretController.php');
+require_once('models/Client.php');
 
 $authController = new AuthController();
 $typePretController = new TypePretController();
@@ -44,7 +45,16 @@ Flight::route('GET /user/formulaireFond', function() use ($userController, $auth
 
 // Routes pour les prêts
 Flight::route('GET /user/listePret', function() use ($pretController) {
-    $pretController->afficherPretByUser($_SESSION['id'] );
+    $clientModel = new Client();
+    $clientId = $clientModel->findClientByUserId($_SESSION['user_id']);
+    if ($clientId) {
+        $pretController->afficherPretByUser($clientId);
+    } else {
+        Flight::json(['error' => 'Client introuvable']);
+    }
+});
+Flight::route('GET /user/pret/details/@id', function($id) use ($pretController) {
+    $pretController->getDetailsPret($id);
 });
 Flight::route('/user/prets/pdf/@id', function($id){
     $pretController = new PretController();

@@ -192,18 +192,20 @@
                             <td><?= isset($pret['type_pret_nom']) ? htmlspecialchars($pret['type_pret_nom']) : 'N/A' ?></td>
                             <td><?= isset($pret['montant']) ? number_format($pret['montant'], 2, ',', ' ') : '0,00' ?> €</td>
                             <td>
-                                <span class="badge <?= isset($pret['statut_id']) ?
-                                    ($pret['statut_id'] == 1 ? 'badge-success' :
-                                        ($pret['statut_id'] == 2 ? 'badge-warning' : 'badge-danger'))
+                                <span class="badge <?= isset($pret['id_statut']) ?
+                                    ($pret['id_statut'] == 1 ? 'badge-warning' :  // En attente
+                                        ($pret['id_statut'] == 2 ? 'badge-success' :  // Approuvé
+                                            ($pret['id_statut'] == 4 ? 'badge-warning' : 'badge-danger'))) // En cours ou autres
                                     : 'badge-warning' ?>">
-                                    <?= isset($pret['statut_nom']) ? htmlspecialchars($pret['statut_nom']) : 'N/A' ?>
+                                    <?= isset($pret['statut_libelle']) ? htmlspecialchars($pret['statut_libelle']) : 'N/A' ?>
                                 </span>
                             </td>
                             <td><?= isset($pret['date_demande']) ? date('d/m/Y', strtotime($pret['date_demande'])) : 'N/A' ?>
                             </td>
                             <td><?= isset($pret['duree_mois']) ? htmlspecialchars($pret['duree_mois']) : 'N/A' ?></td>
                             <td>
-        
+                                    <a href="<?= BASE_URL ?>/user/pret/details/<?= $pret['id'] ?>"
+                                        class="btn btn-sm btn-primary">Détails</a>
                                     <a href="<?= BASE_URL ?>/user/prets/pdf/<?= $pret['id'] ?>"
                                         class="btn btn-sm btn-warning">Generer PDF</a>
                             </td>

@@ -1,9 +1,4 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modifier le Type de Prêt</title>
+
     <style>
         * {
             margin: 0;
@@ -206,5 +201,3 @@
             <a href="<?= BASE_URL ?>/admin/types-pret" class="btn btn-secondary">Annuler</a>
         </form>
     </div>
-</body>
-</html>

@@ -30,7 +30,11 @@ class Pret
 
     public function findAll()
     {
-        $stmt = $this->db->prepare("SELECT * FROM prets");
+        $stmt = $this->db->prepare("SELECT p.*, c.nom as client_nom, tp.nom as type_pret_nom, s.libelle as statut_libelle 
+                                   FROM {$this->table} p 
+                                   LEFT JOIN clients c ON p.client_id = c.id 
+                                   LEFT JOIN type_pret tp ON p.type_pret_id = tp.id 
+                                   LEFT JOIN statut s ON p.id_statut = s.id");
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -191,7 +195,12 @@ class Pret
 
     public function findByClientId($clientId)
     {
-        $stmt = $this->db->prepare("SELECT * FROM {$this->table} WHERE client_id = ?");
+        $stmt = $this->db->prepare("SELECT p.*, c.nom as client_nom, tp.nom as type_pret_nom, s.libelle as statut_libelle 
+                                   FROM {$this->table} p 
+                                   LEFT JOIN clients c ON p.client_id = c.id 
+                                   LEFT JOIN type_pret tp ON p.type_pret_id = tp.id 
+                                   LEFT JOIN statut s ON p.id_statut = s.id 
+                                   WHERE p.client_id = ?");
         $stmt->execute([$clientId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -314,5 +323,12 @@ class Pret
         }
 
         return $amortissement;
+    }
+    public function detailPret($pretId)
+    {
+        $stmt = $this->db->prepare("select * from DetailPret where pret_id = ? LIMIT 1");
+        $stmt->execute([$pretId]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result;
     }
 }

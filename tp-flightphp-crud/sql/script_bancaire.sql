@@ -205,3 +205,26 @@ ALTER TABLE mensualite
 ADD montant_capital DECIMAL(10,2) DEFAULT 0,
 ADD montant_interets DECIMAL(10,2) DEFAULT 0,
 ADD montant_assurance DECIMAL(10,2) DEFAULT 0;
+
+CREATE OR REPLACE VIEW  DetailPret AS
+SELECT 
+    p.id AS pret_id,
+    c.nom AS client_nom,
+    c.email AS client_email,
+    c.salaire AS client_salaire,
+    tc.libelle AS type_client,
+    tp.nom AS type_pret,
+    s.libelle AS statut,
+    v.taux AS taux_interet,
+    p.montant AS montant_pret,
+    p.date_demande AS date_demande,
+    m.montant,
+    m.montant_assurance,
+    m.date_mensualite
+FROM prets p
+JOIN clients c ON p.client_id = c.id
+JOIN type_client tc ON c.type_client_id = tc.id
+JOIN type_pret tp ON p.type_pret_id = tp.id
+JOIN statut s ON p.id_statut = s.id
+JOIN view_taux_pret v ON p.id = v.pret_id
+JOIN mensualite m ON p.id = m.pret_id ORDER BY m.date_mensualite ASC;

@@ -272,4 +272,24 @@ class PretController
             ]);
         }
     }
+    public function getDetailsPret($pretId = null) {
+        if (!$pretId) {
+            $pretId = Flight::request()->query['pret_id'] ?? null;
+        }
+        
+        if (!$pretId) {
+            Flight::json([
+                'success' => false,
+                'message' => 'ID du prêt manquant'
+            ]);
+            return;
+        }
+        
+        $pretDetails = $this->pretModel->detailPret($pretId);
+        Flight::render('client/template/template', [
+            'page' => 'detailsPret',
+            'pretDetails' => $pretDetails
+        ]);
+    }
+
 }

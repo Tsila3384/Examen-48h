@@ -34,3 +34,4 @@ INSERT INTO prets (id_etablissement, client_id, type_pret_id, montant, id_statut
         JOIN statut s ON p.id_statut = s.id
         JOIN view_taux_pret v ON p.id = v.pret_id
         WHERE p.id = 1;
+

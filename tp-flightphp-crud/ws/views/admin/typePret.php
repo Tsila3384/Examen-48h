@@ -1,9 +1,3 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des types de prêt</title>
     <style>
         * {
             margin: 0;
@@ -238,5 +232,3 @@
             <div class="alert alert-info">Aucun type de prêt enregistré</div>
         <?php endif; ?>
     </div>
-</body>
-</html>
