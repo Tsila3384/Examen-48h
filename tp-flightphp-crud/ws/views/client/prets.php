@@ -16,7 +16,7 @@
                     </label>
                     <div class="input-wrapper">
                         <input type="number" id="montant" name="montant" min="1000" step="100" required placeholder="Ex: 25 000">
-                        <div class="input-icon">💰</div>
+                        <div class="input-icon"><i class="fas fa-money-bill-wave"></i></div>
                     </div>
                     <div class="form-hint">Montant minimum : 1 000Ar</div>
                 </div>
@@ -32,7 +32,7 @@
                                 <option value="<?= htmlspecialchars($type['id']) ?>"><?= htmlspecialchars($type['nom']) ?></option>
                             <?php endforeach; ?>
                         </select>
-                        <div class="input-icon">📋</div>
+                        <div class="input-icon"><i class="fas fa-list-alt"></i></div>
                     </div>
                 </div>
 
@@ -42,7 +42,7 @@
                     </label>
                     <div class="input-wrapper">
                         <input type="date" id="date_debut" name="date_debut" required>
-                        <div class="input-icon">📅</div>
+                        <div class="input-icon"><i class="fas fa-calendar-alt"></i></div>
                     </div>
                     <div class="form-hint">Date de début souhaitée du prêt</div>
                 </div>
@@ -54,7 +54,7 @@
                     </label>
                     <div class="input-wrapper">
                         <input type="number" id="duree" name="duree" min="6" max="360" step="1" required placeholder="Ex: 60">
-                        <div class="input-icon">⏱️</div>
+                        <div class="input-icon"><i class="fas fa-clock"></i></div>
                     </div>
                     <div class="form-hint">Entre 6 et 360 mois</div>
                 </div>
@@ -66,7 +66,7 @@
                     </label>
                     <div class="input-wrapper">
                         <input type="number" id="taux_assurance" name="taux_assurance" min="0" step="0.01" required placeholder="Ex: 0.35">
-                        <div class="input-icon">🛡️</div>
+                        <div class="input-icon"><i class="fas fa-shield-alt"></i></div>
                     </div>
                     <div class="form-hint">Taux d'assurance souhaité</div>
                 </div>
@@ -78,7 +78,7 @@
                     </label>
                     <div class="input-wrapper">
                         <input type="number" id="delai_premier_remboursement" name="delai_premier_remboursement" min="0" step="1" required placeholder="Ex: 1">
-                        <div class="input-icon">🗓️</div>
+                        <div class="input-icon"><i class="fas fa-calendar-day"></i></div>
                     </div>
                     <div class="form-hint">Nombre de mois avant le premier remboursement</div>
                 </div>
@@ -88,11 +88,11 @@
             
             <div class="form-actions">
                 <button type="submit" class="btn-submit">
-                    <span class="btn-icon">📄</span>
+                    <span class="btn-icon"><i class="fas fa-file-alt"></i></span>
                     Soumettre la demande
                 </button>
                 <a href="<?= BASE_URL ?>/client/pret/simuler" class="btn-secondary">
-                    <span class="btn-icon">🧮</span>
+                    <span class="btn-icon"><i class="fas fa-calculator"></i></span>
                     Simuler avant de demander
                 </a>
             </div>

@@ -1,6 +1,6 @@
 <div class="container">
     <div class="page-header">
-        <h2>📊 Gestion des Prêts</h2>
+        <h2><i class="fas fa-chart-line"></i> Gestion des Prêts</h2>
         <p>Suivi et gestion de tous vos prêts</p>
     </div>
 
@@ -9,14 +9,14 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>🆔 ID</th>
-                        <th>👤 Client</th>
-                        <th>📋 Type</th>
-                        <th>💰 Montant</th>
-                        <th>🏷️ Statut</th>
-                        <th>📅 Date demande</th>
-                        <th>⏱️ Durée</th>
-                        <th>⚙️ Actions</th>
+                        <th><i class="fas fa-id-card"></i> ID</th>
+                        <th><i class="fas fa-user"></i> Client</th>
+                        <th><i class="fas fa-list-alt"></i> Type</th>
+                        <th><i class="fas fa-money-bill-wave"></i> Montant</th>
+                        <th><i class="fas fa-tag"></i> Statut</th>
+                        <th><i class="fas fa-calendar-alt"></i> Date demande</th>
+                        <th><i class="fas fa-clock"></i> Durée</th>
+                        <th><i class="fas fa-cog"></i> Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -62,12 +62,12 @@
                                     <a href="<?= BASE_URL ?>/user/prets/pdf/<?= $pret['id'] ?>"
                                         class="btn btn-sm btn-warning"
                                         title="Générer le PDF du prêt">
-                                        📄 PDF
+                                        <i class="fas fa-file-pdf"></i> PDF
                                     </a>
                                     <a href="<?= BASE_URL ?>/user/prets/details/<?= $pret['id'] ?>"
                                         class="btn btn-sm btn-primary"
                                         title="Voir les détails">
-                                        👁️ Détails
+                                        <i class="fas fa-eye"></i> Détails
                                     </a>
                                 </div>
                             </td>
@@ -79,7 +79,7 @@
 
         <div class="summary-stats">
             <div class="stat-card">
-                <h3>📊 Statistiques</h3>
+                <h3><i class="fas fa-chart-pie"></i> Statistiques</h3>
                 <p><strong>Total des prêts:</strong> <?= count($prets) ?></p>
                 <p><strong>Montant total:</strong>
                     <?= number_format(array_sum(array_column($prets, 'montant')), 2, ',', ' ') ?> Ar

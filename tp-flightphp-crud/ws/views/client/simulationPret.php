@@ -17,7 +17,7 @@
                         </label>
                         <div class="input-wrapper">
                             <input type="number" id="montant" name="montant" min="1000" step="100" required placeholder="Ex: 25 000">
-                            <div class="input-icon">💰</div>
+                            <div class="input-icon"><i class="fas fa-money-bill-wave"></i></div>
                         </div>
                         <div class="range-slider">
                             <input type="range" id="montantRange" min="1000" max="10000000" step="1000" value="25000">
@@ -35,7 +35,7 @@
                         </label>
                         <div class="input-wrapper">
                             <input type="number" id="duree" name="duree" min="6" max="360" step="1" required placeholder="Ex: 60">
-                            <div class="input-icon">⏱️</div>
+                            <div class="input-icon"><i class="fas fa-clock"></i></div>
                         </div>
                         <div class="range-slider">
                             <input type="range" id="dureeRange" min="6" max="360" step="6" value="60">
@@ -53,7 +53,7 @@
                         </label>
                         <div class="input-wrapper">
                             <input type="number" id="taux_interet" name="taux_interet" min="0" step="0.01" required placeholder="Ex: 3.5">
-                            <div class="input-icon">📊</div>
+                            <div class="input-icon"><i class="fas fa-percentage"></i></div>
                         </div>
                         <div class="range-slider">
                             <input type="range" id="tauxRange" min="0" max="10" step="0.1" value="3.5">
@@ -71,7 +71,7 @@
                         </label>
                         <div class="input-wrapper">
                             <input type="number" id="taux_assurance" name="taux_assurance" min="0" step="0.01" required placeholder="Ex: 0.35">
-                            <div class="input-icon">🛡️</div>
+                            <div class="input-icon"><i class="fas fa-shield-alt"></i></div>
                         </div>
                         <div class="range-slider">
                             <input type="range" id="assuranceRange" min="0" max="10" step="0.01" value="0.35">
@@ -84,7 +84,7 @@
                 </div>
 
                 <button type="submit" class="btn-simulate">
-                    <span class="btn-icon">🧮</span>
+                    <span class="btn-icon"><i class="fas fa-calculator"></i></span>
                     Calculer ma mensualité
                 </button>
             </form>
@@ -128,7 +128,7 @@
 
                 <div class="result-actions">
                     <a href="<?= BASE_URL ?>/client/prets/formulairePret" class="btn-primary">
-                        <span class="btn-icon">📝</span>
+                        <span class="btn-icon"><i class="fas fa-file-signature"></i></span>
                         Faire une demande
                     </a>
                 </div>

@@ -2,7 +2,7 @@
 
 <div class="container">
     <div class="page-header">
-        <h2>🏦 Types de Prêts Disponibles</h2>
+        <h2><i class="fas fa-university"></i> Types de Prêts Disponibles</h2>
         <p>Découvrez nos différentes offres de prêts adaptées à vos besoins</p>
     </div>
 
@@ -11,9 +11,9 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>📋 Nom du prêt</th>
-                        <th>📈 Taux d'intérêt</th>
-                        <th>⏳ Durée maximale</th>
+                        <th><i class="fas fa-list-alt"></i> Nom du prêt</th>
+                        <th><i class="fas fa-chart-line"></i> Taux d'intérêt</th>
+                        <th><i class="fas fa-clock"></i> Durée maximale</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -55,7 +55,7 @@
 
         <div class="info-cards">
             <div class="info-card">
-                <h3>🧮 Simulation gratuite</h3>
+                <h3><i class="fas fa-calculator"></i> Simulation gratuite</h3>
                 <p>Calculez votre mensualité et obtenez une estimation immédiate.</p>
                 <a href="<?= BASE_URL ?>/simulation" class="btn btn-primary">Simuler un prêt</a>
             </div>

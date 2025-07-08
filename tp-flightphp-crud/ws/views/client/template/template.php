@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Espace Client Bancaire</title>
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/template.css">
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <!-- Header avec toggle menu -->
@@ -28,27 +30,27 @@
         </div>
         <ul class="sidebar-menu">
             <li><a href="<?= BASE_URL ?>/client/dashboard" class="menu-item">
-                <i class="icon">📊</i>
+                <i class="icon fas fa-chart-line"></i>
                 <span>Dashboard</span>
             </a></li>
             <li><a href="<?= BASE_URL ?>/client/prets/formulairePret" class="menu-item">
-                <i class="icon">📝</i>
+                <i class="icon fas fa-file-signature"></i>
                 <span>Demandes de prêt</span>
             </a></li>
             <li><a href="<?= BASE_URL ?>/client/pret/simuler" class="menu-item">
-                <i class="icon">🧮</i>
+                <i class="icon fas fa-calculator"></i>
                 <span>Simuler un prêt</span>
             </a></li>
             <li><a href="<?= BASE_URL ?>/client/types-pret" class="menu-item">
-                <i class="icon">📋</i>
+                <i class="icon fas fa-list-alt"></i>
                 <span>Types de prêt</span>
             </a></li>
             <li><a href="<?= BASE_URL ?>/user/listePret" class="menu-item">
-                <i class="icon">📚</i>
+                <i class="icon fas fa-history"></i>
                 <span>Historique des prêts</span>
             </a></li>
             <li><a href="<?= BASE_URL ?>/auth/deconnexion" class="menu-item logout">
-                <i class="icon">🚪</i>
+                <i class="icon fas fa-sign-out-alt"></i>
                 <span>Déconnexion</span>
             </a></li>
         </ul>
