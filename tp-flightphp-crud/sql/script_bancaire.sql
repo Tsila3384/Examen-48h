@@ -229,3 +229,24 @@ JOIN type_pret tp ON p.type_pret_id = tp.id
 JOIN statut s ON p.id_statut = s.id
 JOIN view_taux_pret v ON p.id = v.pret_id
 JOIN mensualite m ON p.id = m.pret_id ORDER BY m.date_mensualite ASC;
+
+CREATE OR REPLACE VIEW view_mensualites_fonds_par_mois AS
+SELECT 
+    AnneeMois,
+    total_mensualites,
+    (fonds_initiaux + cumul_mensualites_precedentes) as fonds_disponibles,
+    (total_mensualites + fonds_initiaux + cumul_mensualites_precedentes) as total_mensualites_plus_fonds
+FROM (
+    SELECT 
+        CONCAT(YEAR(m.date_mensualite), '-', LPAD(MONTH(m.date_mensualite), 2, '0')) as AnneeMois,
+        SUM(COALESCE(m.montant, 0)) as total_mensualites,
+        (SELECT fonds_disponibles FROM etablissement LIMIT 1) as fonds_initiaux,
+        (
+            SELECT COALESCE(SUM(m2.montant), 0)
+            FROM mensualite m2 
+            WHERE m2.date_mensualite < DATE(CONCAT(YEAR(m.date_mensualite), '-', MONTH(m.date_mensualite), '-01'))
+        ) as cumul_mensualites_precedentes
+    FROM mensualite m
+    GROUP BY YEAR(m.date_mensualite), MONTH(m.date_mensualite)
+) as calculs
+ORDER BY AnneeMois;
