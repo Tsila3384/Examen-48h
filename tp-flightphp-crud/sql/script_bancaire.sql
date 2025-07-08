@@ -106,7 +106,7 @@ CREATE TABLE historique_fonds (
 );
 
 --vue recuperation de taux
-CREATE VIEW view_taux_pret AS
+CREATE OR REPLACE VIEW view_taux_pret AS
 SELECT 
     p.id as pret_id,
     p.client_id,
