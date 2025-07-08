@@ -47,20 +47,20 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="taux_interet">
-                            <span class="label-text">Taux d'intérêt</span>
-                            <span class="label-unit">%</span>
+                        <label for="type_pret_id">
+                            <span class="label-text">Type de prêt</span>
+                            <span class="label-unit" id="taux_interet_display"></span>
                         </label>
                         <div class="input-wrapper">
-                            <input type="number" id="taux_interet" name="taux_interet" min="0" step="0.01" required placeholder="Ex: 3.5">
-                            <div class="input-icon"><i class="fas fa-percentage"></i></div>
-                        </div>
-                        <div class="range-slider">
-                            <input type="range" id="tauxRange" min="0" max="10" step="0.1" value="3.5">
-                            <div class="range-labels">
-                                <span>0%</span>
-                                <span>10%</span>
-                            </div>
+                            <select id="type_pret_id" name="type_pret_id" required>
+                                <option value="" disabled selected>Sélectionnez un type de prêt</option>
+                                <?php foreach ($typesPret as $type): ?>
+                                    <option value="<?= htmlspecialchars($type['id']) ?>" data-taux="<?= htmlspecialchars($type['taux_interet']) ?>">
+                                        <?= htmlspecialchars($type['nom']) ?> (<?= htmlspecialchars($type['taux_interet']) ?>%)
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <div class="input-icon"><i class="fas fa-hand-holding-usd"></i></div>
                         </div>
                     </div>
 
@@ -95,7 +95,7 @@
                 <div class="result-header">
                     <h2>Résultat de votre simulation</h2>
                 </div>
-                
+
                 <div class="result-main">
                     <div class="main-amount">
                         <span class="amount-label">Votre mensualité</span>
@@ -131,6 +131,10 @@
                         <span class="btn-icon"><i class="fas fa-file-signature"></i></span>
                         Faire une demande
                     </a>
+                    <button id="saveSimulation" class="btn-primary">
+                        <span class="btn-icon"><i class="fas fa-save"></i></span>
+                        Sauvegarder la simulation
+                    </button>
                 </div>
             </div>
         </div>
@@ -141,20 +145,20 @@
     const form = document.getElementById('simulationForm');
     const alert = document.getElementById('alert');
     const simulationResult = document.getElementById('simulationResult');
-    
-    // Éléments du formulaire
+
+    // Form elements
     const montantInput = document.getElementById('montant');
     const dureeInput = document.getElementById('duree');
-    const tauxInput = document.getElementById('taux_interet');
+    const typePretSelect = document.getElementById('type_pret_id');
     const assuranceInput = document.getElementById('taux_assurance');
-    
+    const tauxInteretDisplay = document.getElementById('taux_interet_display');
+
     // Sliders
     const montantRange = document.getElementById('montantRange');
     const dureeRange = document.getElementById('dureeRange');
-    const tauxRange = document.getElementById('tauxRange');
     const assuranceRange = document.getElementById('assuranceRange');
-    
-    // Résultats
+
+    // Result elements
     const mensualiteTotale = document.getElementById('mensualiteTotale');
     const montantPret = document.getElementById('montantPret');
     const mensualiteSansAssurance = document.getElementById('mensualiteSansAssurance');
@@ -162,22 +166,34 @@
     const coutTotal = document.getElementById('coutTotal');
     const coutAssurance = document.getElementById('coutAssurance');
 
-    // Synchronisation sliders et inputs
+    // Synchronize sliders and inputs
     montantRange.addEventListener('input', () => montantInput.value = montantRange.value);
     montantInput.addEventListener('input', () => montantRange.value = montantInput.value);
-    
+
     dureeRange.addEventListener('input', () => dureeInput.value = dureeRange.value);
     dureeInput.addEventListener('input', () => dureeRange.value = dureeInput.value);
-    
-    tauxRange.addEventListener('input', () => tauxInput.value = tauxRange.value);
-    tauxInput.addEventListener('input', () => tauxRange.value = tauxInput.value);
-    
+
     assuranceRange.addEventListener('input', () => assuranceInput.value = assuranceRange.value);
     assuranceInput.addEventListener('input', () => assuranceRange.value = assuranceInput.value);
 
+    // Update interest rate display
+    function updateTauxDisplay() {
+        const selectedOption = typePretSelect.options[typePretSelect.selectedIndex];
+        if (selectedOption && selectedOption.dataset.taux) {
+            tauxInteretDisplay.textContent = ${selectedOption.dataset.taux}%;
+        } else {
+            tauxInteretDisplay.textContent = '';
+        }
+    }
+
+    typePretSelect.addEventListener('change', updateTauxDisplay);
+
+    // Initialize interest rate display
+    document.addEventListener('DOMContentLoaded', updateTauxDisplay);
+
     function showAlert(message, type) {
         alert.textContent = message;
-        alert.className = `alert alert-${type}`;
+        alert.className = alert alert-${type};
         alert.style.display = 'block';
         setTimeout(() => {
             alert.style.display = 'none';
@@ -189,6 +205,8 @@
 
         const formData = new FormData(form);
         const data = Object.fromEntries(formData);
+        const selectedOption = typePretSelect.options[typePretSelect.selectedIndex];
+        data.taux_interet = selectedOption ? selectedOption.dataset.taux : null;
 
         // Validations
         if (data.montant < 1000) {
@@ -199,8 +217,8 @@
             showAlert('La durée doit être entre 6 et 360 mois', 'error');
             return;
         }
-        if (data.taux_interet < 0) {
-            showAlert('Le taux d\'intérêt ne peut pas être négatif', 'error');
+        if (!data.type_pret_id) {
+            showAlert('Veuillez sélectionner un type de prêt', 'error');
             return;
         }
         if (data.taux_assurance < 0) {
@@ -227,15 +245,17 @@
                 const totalPret = amortissement.reduce((sum, month) => sum + month.mensualite, 0);
                 const mensualiteBase = firstMonth.mensualite - firstMonth.assurance;
 
-                montantPret.textContent = `${parseFloat(data.montant).toLocaleString()} Ar`;
-                mensualiteSansAssurance.textContent = `${mensualiteBase.toFixed(2)} Ar`;
-                assuranceMensuelle.textContent = `${firstMonth.assurance.toFixed(2)} Ar`;
-                mensualiteTotale.textContent = `${firstMonth.mensualite.toFixed(2)} Ar`;
-                coutTotal.textContent = `${(totalPret).toFixed(2)} Ar`;
-                coutAssurance.textContent = `${totalAssurance.toFixed(2)} Ar`;
+                montantPret.textContent = ${parseFloat(data.montant).toLocaleString()} Ar;
+                mensualiteSansAssurance.textContent = ${mensualiteBase.toFixed(2)} Ar;
+                assuranceMensuelle.textContent = ${firstMonth.assurance.toFixed(2)} Ar;
+                mensualiteTotale.textContent = ${firstMonth.mensualite.toFixed(2)} Ar;
+                coutTotal.textContent = ${totalPret.toFixed(2)} Ar;
+                coutAssurance.textContent = ${totalAssurance.toFixed(2)} Ar;
 
                 simulationResult.style.display = 'block';
-                simulationResult.scrollIntoView({ behavior: 'smooth' });
+                simulationResult.scrollIntoView({
+                    behavior: 'smooth'
+                });
                 showAlert('Simulation effectuée avec succès', 'success');
             } else {
                 showAlert(result.message, 'error');
@@ -244,6 +264,33 @@
         } catch (error) {
             showAlert('Erreur de connexion au serveur', 'error');
             simulationResult.style.display = 'none';
+        }
+    });
+
+    document.getElementById('saveSimulation').addEventListener('click', async () => {
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
+        const selectedOption = typePretSelect.options[typePretSelect.selectedIndex];
+        data.taux_interet = selectedOption ? selectedOption.dataset.taux : null;
+
+        try {
+            const response = await fetch('<?= BASE_URL ?>/client/pret/sauvegarderSimulation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                showAlert('Simulation sauvegardée avec succès', 'success');
+            } else {
+                showAlert(result.message, 'error');
+            }
+        } catch (error) {
+            showAlert('Erreur lors de la sauvegarde de la simulation', 'error');
         }
     });
 </script>

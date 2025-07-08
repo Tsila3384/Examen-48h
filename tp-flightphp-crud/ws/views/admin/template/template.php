@@ -63,14 +63,13 @@
                     <i class="icon fas fa-chart-bar"></i>
                     <span>Tableau et Graphe</span>
                 </a></li>
-            <li><a href="<?= BASE_URL ?>/client/pret/simuler" class="menu-item">
-                    <i class="icon fas fa-calculator"></i>
-                    <span>Simuler Prêt</span>
-                </a></li>
             <li><a href="<?= BASE_URL ?>/admin/fonds" class="menu-item">
                     <i class="icon fas fa-wallet"></i>
                     <span>Fonds Disponibles</span>
                 </a></li>
+            <li><a href="<?= BASE_URL ?>/client/simulations" class="menu-item">
+                    <i class="icon fas fa-list"></i>
+                    <span>Mes simulations</span>
             <li><a href="<?= BASE_URL ?>/auth/deconnexion" class="menu-item logout">
                     <i class="icon fas fa-sign-out-alt"></i>
                     <span>Déconnexion</span>

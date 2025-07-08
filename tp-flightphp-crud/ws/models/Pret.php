@@ -362,4 +362,88 @@ class Pret
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function sauvegarderSimulation($userId, $clientId, $montant, $typePretId, $duree, $tauxInteret, $tauxAssurance, $delaiPremierRemboursement, $amortissement)
+    {
+        $this->db->beginTransaction();
+        try {
+            // Insérer la simulation
+            $stmt = $this->db->prepare("
+            INSERT INTO simulations (user_id, client_id, montant, type_pret_id, duree_mois, taux_interet, taux_assurance, delai_premier_remboursement, date_simulation)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+        ");
+            $stmt->execute([
+                $userId,
+                $clientId,
+                $montant,
+                $typePretId,
+                $duree,
+                $tauxInteret,
+                $tauxAssurance,
+                $delaiPremierRemboursement
+            ]);
+            $simulationId = $this->db->lastInsertId();
+
+            // Insérer les mensualités de la simulation
+            $stmtMensualite = $this->db->prepare("
+            INSERT INTO simulation_mensualites (simulation_id, mois, date_mensualite, montant, montant_capital, montant_interets, montant_assurance, capital_restant)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+            foreach ($amortissement as $mensualite) {
+                $stmtMensualite->execute([
+                    $simulationId,
+                    $mensualite['mois'],
+                    $mensualite['date'],
+                    $mensualite['mensualite'],
+                    $mensualite['capital'],
+                    $mensualite['interets'],
+                    $mensualite['assurance'],
+                    $mensualite['capital_restant']
+                ]);
+            }
+
+            $this->db->commit();
+            return $simulationId;
+        } catch (Exception $e) {
+            $this->db->rollback();
+            error_log("sauvegarderSimulation: Erreur lors de la sauvegarde de la simulation : " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function findSimulationById($simulationId)
+    {
+        $stmt = $this->db->prepare("SELECT * FROM simulations WHERE id = ?");
+        $stmt->execute([$simulationId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function findAllSimulations()
+    {
+        $stmt = $this->db->prepare("
+        SELECT s.*, c.nom as client_nom, tp.nom as type_pret_nom
+        FROM simulations s
+        LEFT JOIN clients c ON s.client_id = c.id
+        LEFT JOIN type_pret tp ON s.type_pret_id = tp.id
+    ");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function updateSimulationStatus($simulationId, $status)
+    {
+        $stmt = $this->db->prepare("UPDATE simulations SET statut = ? WHERE id = ?");
+        $stmt->execute([$status, $simulationId]);
+    }
+
+    public function findSimulationsByUserId($userId)
+    {
+        $stmt = $this->db->prepare("
+        SELECT s.*, tp.nom as type_pret_nom
+        FROM simulations s
+        LEFT JOIN type_pret tp ON s.type_pret_id = tp.id
+        WHERE s.user_id = ?
+    ");
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
