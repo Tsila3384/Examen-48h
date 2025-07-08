@@ -94,12 +94,19 @@ class PretController
         $delaiPremierRemboursement = $input['delai_premier_remboursement'] ?? 0;
 
         if ($clientId && $montant > 0 && $typePretId && $dateDebut && $duree > 0 && $tauxAssurance >= 0 && $delaiPremierRemboursement >= 0) {
-            $pretId = $this->pretModel->insererPret($clientId, $montant, $typePretId, $dateDebut, $duree, $tauxAssurance, $delaiPremierRemboursement);
-            Flight::json([
-                'success' => true,
-                'message' => 'Prêt ajouté avec succès',
-                'pret_id' => $pretId
-            ]);
+            try {
+                $pretId = $this->pretModel->insererPret($clientId, $montant, $typePretId, $dateDebut, $duree, $tauxAssurance, $delaiPremierRemboursement);
+                Flight::json([
+                    'success' => true,
+                    'message' => 'Prêt ajouté avec succès',
+                    'pret_id' => $pretId
+                ]);
+            } catch (Exception $e) {
+                Flight::json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ]);
+            }
         } else {
             Flight::json([
                 'success' => false,
@@ -157,17 +164,35 @@ class PretController
         }
     }
 
-    public function rejeterPret($pretId) {
-        $result = $this->pretModel->rejeterPret($pretId);
-        if ($result) {
-            Flight::json([
-                'success' => true,
-                'message' => 'Prêt rejeté avec succès'
-            ]);
-        } else {
+    public function rejeterPret() {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $pretId = $input['pret_id'] ?? null;
+
+        if (!$pretId) {
             Flight::json([
                 'success' => false,
-                'message' => 'Erreur lors du rejet du prêt'
+                'message' => 'ID du prêt manquant'
+            ]);
+            return;
+        }
+
+        try {
+            $result = $this->pretModel->rejeterPret($pretId);
+            if ($result) {
+                Flight::json([
+                    'success' => true,
+                    'message' => 'Prêt rejeté avec succès'
+                ]);
+            } else {
+                Flight::json([
+                    'success' => false,
+                    'message' => 'Erreur lors du rejet du prêt'
+                ]);
+            }
+        } catch (Exception $e) {
+            Flight::json([
+                'success' => false,
+                'message' => 'Erreur serveur : ' . $e->getMessage()
             ]);
         }
     }

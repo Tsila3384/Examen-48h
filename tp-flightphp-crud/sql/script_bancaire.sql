@@ -218,6 +218,7 @@ SELECT
     v.taux AS taux_interet,
     p.montant AS montant_pret,
     p.date_demande AS date_demande,
+    p.duree_mois AS duree_mois,
     m.montant,
     m.montant_assurance,
     m.date_mensualite
