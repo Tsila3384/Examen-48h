@@ -1,196 +1,45 @@
-<!DOCTYPE html>
-<html lang="fr">
+<div class="container">
+    <div class="page-header">
+        <h2><i class="fas fa-chart-line"></i> Gestion des Prêts</h2>
+        <p>Suivi et gestion de tous vos prêts</p>
+    </div>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Prêts</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background-color: #f8fafc;
-            line-height: 1.6;
-            color: #334155;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-        }
-
-        h2 {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-
-        /* Boutons */
-        .btn {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            text-decoration: none;
-            font-weight: 500;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 0.875rem;
-            text-align: center;
-        }
-
-        .btn-primary {
-            background-color: #3b82f6;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #2563eb;
-            transform: translateY(-1px);
-        }
-
-        .btn-warning {
-            background-color: #f59e0b;
-            color: white;
-        }
-
-        .btn-warning:hover {
-            background-color: #d97706;
-        }
-
-        .btn-danger {
-            background-color: #ef4444;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background-color: #dc2626;
-        }
-
-        .btn-sm {
-            padding: 0.25rem 0.75rem;
-            font-size: 0.75rem;
-        }
-
-        .mb-3 {
-            margin-bottom: 1.5rem;
-        }
-
-        /* Tableau */
-        .table {
-            width: 100%;
-            background-color: white;
-            border-radius: 0.75rem;
-            overflow: hidden;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-
-        .table thead {
-            background-color: #f1f5f9;
-        }
-
-        .table th {
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
-            color: #475569;
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .table td {
-            padding: 1rem;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        .table tbody tr:hover {
-            background-color: #f8fafc;
-        }
-
-        .table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        /* Badges pour statuts */
-        .badge {
-            display: inline-block;
-            padding: 0.25rem 0.5rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .badge-success {
-            background-color: #d1fae5;
-            color: #065f46;
-        }
-
-        .badge-warning {
-            background-color: #fef3c7;
-            color: #92400e;
-        }
-
-        .badge-danger {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-
-            h2 {
-                font-size: 1.5rem;
-                margin-bottom: 1.5rem;
-            }
-
-            .table {
-                font-size: 0.875rem;
-            }
-
-            .table th,
-            .table td {
-                padding: 0.75rem 0.5rem;
-            }
-        }
-    </style>
-</head>
-
-<body>
-    <div class="container">
-        <h2>Gestion des Prêts</h2>
-        <?php if (!empty($prets)): ?>
+    <?php if (!empty($prets)): ?>
+        <div class="table-container">
             <table class="table">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Client</th>
-                        <th>Type</th>
-                        <th>Montant</th>
-                        <th>Statut</th>
-                        <th>Date demande</th>
-                        <th>Durée (mois)</th>
-                        <th>Actions</th>
+                        <th><i class="fas fa-id-card"></i> ID</th>
+                        <th><i class="fas fa-user"></i> Client</th>
+                        <th><i class="fas fa-list-alt"></i> Type</th>
+                        <th><i class="fas fa-money-bill-wave"></i> Montant</th>
+                        <th><i class="fas fa-tag"></i> Statut</th>
+                        <th><i class="fas fa-calendar-alt"></i> Date demande</th>
+                        <th><i class="fas fa-clock"></i> Durée</th>
+                        <th><i class="fas fa-cog"></i> Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($prets as $pret): ?>
-                        <tr>
-                            <td><?= isset($pret['id']) ? htmlspecialchars($pret['id']) : 'N/A' ?></td>
-                            <td><?= isset($pret['client_nom']) ? htmlspecialchars($pret['client_nom']) : 'N/A' ?></td>
-                            <td><?= isset($pret['type_pret_nom']) ? htmlspecialchars($pret['type_pret_nom']) : 'N/A' ?></td>
-                            <td><?= isset($pret['montant']) ? number_format($pret['montant'], 2, ',', ' ') : '0,00' ?> €</td>
+                    <?php foreach ($prets as $index => $pret): ?>
+                        <tr style="animation-delay: <?= $index * 0.1 ?>s;">
+                            <td>
+                                <strong><?= isset($pret['id']) ? htmlspecialchars($pret['id']) : 'N/A' ?></strong>
+                            </td>
+                            <td>
+                                <div class="client-info">
+                                    <strong><?= isset($pret['client_nom']) ? htmlspecialchars($pret['client_nom']) : 'N/A' ?></strong>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="type-badge">
+                                    <?= isset($pret['type_pret_nom']) ? htmlspecialchars($pret['type_pret_nom']) : 'N/A' ?>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="amount">
+                                    <?= isset($pret['montant']) ? number_format($pret['montant'], 2, ',', ' ') : '0,00' ?> Ar
+                                </span>
+                            </td>
                             <td>
                                 <span class="badge <?= isset($pret['id_statut']) ?
                                     ($pret['id_statut'] == 1 ? 'badge-warning' :  // En attente
@@ -200,23 +49,42 @@
                                     <?= isset($pret['statut_libelle']) ? htmlspecialchars($pret['statut_libelle']) : 'N/A' ?>
                                 </span>
                             </td>
-                            <td><?= isset($pret['date_demande']) ? date('d/m/Y', strtotime($pret['date_demande'])) : 'N/A' ?>
-                            </td>
-                            <td><?= isset($pret['duree_mois']) ? htmlspecialchars($pret['duree_mois']) : 'N/A' ?></td>
                             <td>
                                     <a href="<?= BASE_URL ?>/user/pret/details/<?= $pret['id'] ?>"
                                         class="btn btn-sm btn-primary">Détails</a>
                                     <a href="<?= BASE_URL ?>/user/prets/pdf/<?= $pret['id'] ?>"
-                                        class="btn btn-sm btn-warning">Generer PDF</a>
+                                        class="btn btn-sm btn-warning"
+                                        title="Générer le PDF du prêt">
+                                        <i class="fas fa-file-pdf"></i> PDF
+                                    </a>
+                                    <a href="<?= BASE_URL ?>/user/prets/details/<?= $pret['id'] ?>"
+                                        class="btn btn-sm btn-primary"
+                                        title="Voir les détails">
+                                        <i class="fas fa-eye"></i> Détails
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
-        <?php else: ?>
-            <div class="alert alert-info">Aucun prêt enregistré</div>
-        <?php endif; ?>
-    </div>
-</body>
+        </div>
 
-</html>
+        <div class="summary-stats">
+            <div class="stat-card">
+                <h3><i class="fas fa-chart-pie"></i> Statistiques</h3>
+                <p><strong>Total des prêts:</strong> <?= count($prets) ?></p>
+                <p><strong>Montant total:</strong>
+                    <?= number_format(array_sum(array_column($prets, 'montant')), 2, ',', ' ') ?> Ar
+                </p>
+            </div>
+        </div>
+
+    <?php else: ?>
+        <div class="alert alert-info">
+            <strong>Aucun prêt enregistré</strong>
+            <p>Vous n'avez encore aucun prêt dans le système.</p>
+        </div>
+    <?php endif; ?>
+</div>
+<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/list.css">

@@ -60,7 +60,7 @@ class AuthController
                 'success' => true,
                 'message' => 'Connexion réussie',
                 'role' => $user['role'],
-                'redirect' => BASE_URL . ($user['role'] === 'admin' ? '/admin/dashboard' : '/client/types-pret')
+                'redirect' => BASE_URL . ($user['role'] === 'admin' ? '/admin/dashboard' : '/client/dashboard')
             ]);
         } else {
             Flight::json([
@@ -155,7 +155,7 @@ class AuthController
     }
 
     // Déconnexion
-    public function deconnexion()
+    public function deco()
     {
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
@@ -168,6 +168,17 @@ class AuthController
             'message' => 'Déconnexion réussie',
             'redirect' => BASE_URL . '/auth/connexion'
         ]);
+    }
+
+    public function deconnexion()
+    {
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        session_destroy();
+
+        Flight::redirect('/auth/connexion');
     }
 
     // Vérifier si l'utilisateur est connecté
