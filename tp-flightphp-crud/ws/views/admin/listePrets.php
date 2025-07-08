@@ -1,4 +1,4 @@
-    <a href="<?= BASE_URL ?>/admin/prets/nouveau" class="btn btn-primary">
+<a href="<?= BASE_URL ?>/admin/prets/nouveau" class="btn btn-primary">
         <i class="fas fa-plus"></i> Nouvelle Demande
     </a>
 <div class="content-header">
@@ -107,9 +107,15 @@
                             </td>
                             <td>
                                 <div class="actions">
+                                    <button onclick="voirDetails(<?= $pret['id'] ?>)" class="btn btn-sm btn-info" title="Voir les détails">
+                                        <i class="fas fa-eye"></i> Détails
+                                    </button>
+                                    <button onclick="telechargerPDF(<?= $pret['id'] ?>)" class="btn btn-sm btn-secondary" title="Télécharger PDF">
+                                        <i class="fas fa-file-pdf"></i> PDF
+                                    </button>
                                     <?php if ($pret['id_statut'] == 1): ?>
-                                        <button class="btn btn-sm btn-info" onclick="validerPret(<?= $pret['id'] ?>)" title="Valider">
-                                            <i class="fas fa-clipboard-check"></i> Valider
+                                        <button class="btn btn-sm btn-success" onclick="validerPret(<?= $pret['id'] ?>)" title="Valider">
+                                            <i class="fas fa-check"></i> Valider
                                         </button>
                                         <button class="btn btn-sm btn-danger" onclick="rejeterPret(<?= $pret['id'] ?>)" title="Rejeter">
                                             <i class="fas fa-times"></i> Rejeter
@@ -129,9 +135,31 @@
     <?php endif; ?>
 </div>
 
+<!-- Modal pour les détails du prêt -->
+<div id="modalDetails" class="modal">
+    <div class="modal-content modal-large">
+        <div class="modal-header">
+            <h3>📋 Détails du Prêt</h3>
+            <span class="close" onclick="fermerModalDetails()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="detailsContent">
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i> Chargement...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- Loading overlay -->
+<div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <div class="loading-content">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Génération du PDF en cours...</p>
+    </div>
+</div>
 
-<!-- ...existing code... -->
 
 <style>
     /* Styles pour la page liste des prêts */
@@ -199,24 +227,6 @@
         background-color: #545b62;
     }
 
-    .btn-warning {
-        background-color: #ffc107;
-        color: #212529;
-    }
-
-    .btn-warning:hover {
-        background-color: #e0a800;
-    }
-
-    .btn-info {
-        background-color: #17a2b8;
-        color: white;
-    }
-
-    .btn-info:hover {
-        background-color: #138496;
-    }
-
     .btn-success {
         background-color: #28a745;
         color: white;
@@ -226,13 +236,35 @@
         background-color: #1e7e34;
     }
 
+    .btn-info {
+        background-color: #17a2b8;
+        color: white;
+    }
+
+    .btn-info:hover {
+        background-color: #117a8b;
+    }
+
     .btn-danger {
         background-color: #dc3545;
         color: white;
     }
 
     .btn-danger:hover {
-        background-color: #c82333;
+        background-color: #bd2130;
+    }
+
+    /* Actions dans le tableau */
+    .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .actions .btn {
+        white-space: nowrap;
     }
 
     /* État vide */
@@ -430,6 +462,114 @@
         padding: 20px;
     }
 
+    .modal-large {
+        max-width: 800px;
+    }
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-item {
+        padding: 1rem;
+        border-left: 4px solid #3b82f6;
+        background-color: #f8fafc;
+        border-radius: 0 0.5rem 0.5rem 0;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: #475569;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.25rem;
+    }
+
+    .detail-value {
+        font-size: 1.125rem;
+        color: #1e293b;
+        font-weight: 500;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 2rem;
+        color: #6c757d;
+    }
+
+    .loading i {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .loading-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .loading-content i {
+        font-size: 2rem;
+        color: #007bff;
+        margin-bottom: 1rem;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .badge-success {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+
+    .badge-warning {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
+
+    .badge-danger {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+
+    .badge-info {
+        background-color: #dbeafe;
+        color: #1e40af;
+    }
+
     /* Formulaires */
     .form-group {
         margin-bottom: 20px;
@@ -498,19 +638,197 @@
 </style>
 
 <script>
-    const apiBase = "http://localhost<?= BASE_URL ?>";
+    const apiBase = "<?= BASE_URL ?>";
 
-    function ajax(method, url, data, callback) {
+    function ajax(method, url, data, callback, errorCallback = null) {
         const xhr = new XMLHttpRequest();
-        xhr.open(method, apiBase + url, true);
-        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.open(method, url, true);
+        
+        if (method === 'POST') {
+            xhr.setRequestHeader("Content-Type", "application/json");
+        }
+        
         xhr.onreadystatechange = () => {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                callback(JSON.parse(xhr.responseText));
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        callback(response);
+                    } catch (e) {
+                        // Si ce n'est pas du JSON, retourner le texte brut
+                        callback({ success: true, data: xhr.responseText });
+                    }
+                } else {
+                    if (errorCallback) {
+                        errorCallback(xhr);
+                    } else {
+                        alert('Erreur de communication avec le serveur');
+                    }
+                }
             }
         };
+        
         xhr.send(data);
     }
+
+    function voirDetails(pretId) {
+        document.getElementById('modalDetails').style.display = 'block';
+        document.getElementById('detailsContent').innerHTML = `
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin"></i> Chargement des détails...
+            </div>
+        `;
+
+        // Charger les détails via AJAX
+        ajax('GET', apiBase + '/admin/prets/details/' + pretId + '?ajax=1', null, function(response) {
+            if (response.success) {
+                afficherDetails(response.data);
+            } else {
+                document.getElementById('detailsContent').innerHTML = `
+                    <div class="alert alert-danger">
+                        Erreur lors du chargement des détails : ${response.message || 'Erreur inconnue'}
+                    </div>
+                `;
+            }
+        }, function(xhr) {
+            document.getElementById('detailsContent').innerHTML = `
+                <div class="alert alert-danger">
+                    Erreur de communication avec le serveur (${xhr.status})
+                </div>
+            `;
+        });
+    }
+
+    function afficherDetails(pretDetails) {
+        const statutBadge = getStatutBadge(pretDetails.statut);
+        
+        const html = `
+            <div class="details-content">
+                <h4 class="section-title">Informations générales</h4>
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">ID du Prêt</div>
+                        <div class="detail-value">#${pretDetails.pret_id || 'N/A'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Montant</div>
+                        <div class="detail-value">${formatMoney(pretDetails.montant_pret || 0)} €</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Type de Prêt</div>
+                        <div class="detail-value">${pretDetails.type_pret || 'N/A'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Statut</div>
+                        <div class="detail-value">${statutBadge}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Date de demande</div>
+                        <div class="detail-value">${formatDate(pretDetails.date_demande)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Durée</div>
+                        <div class="detail-value">${pretDetails.duree_mois || 'N/A'} mois</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Taux d'intérêt</div>
+                        <div class="detail-value">${pretDetails.taux_interet || 'N/A'}%</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Mensualité</div>
+                        <div class="detail-value">${formatMoney(pretDetails.montant || 0)} €</div>
+                    </div>
+                </div>
+
+                <h4 class="section-title">Informations client</h4>
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Nom du client</div>
+                        <div class="detail-value">${pretDetails.client_nom || 'N/A'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Email</div>
+                        <div class="detail-value">${pretDetails.client_email || 'N/A'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Salaire</div>
+                        <div class="detail-value">${formatMoney(pretDetails.client_salaire || 0)} €</div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('detailsContent').innerHTML = html;
+    }
+
+    function getStatutBadge(statut) {
+        let badgeClass = 'badge-info';
+        switch(statut) {
+            case 'Approuvé':
+                badgeClass = 'badge-success';
+                break;
+            case 'Rejeté':
+                badgeClass = 'badge-danger';
+                break;
+            case 'En attente':
+                badgeClass = 'badge-warning';
+                break;
+        }
+        return `<span class="badge ${badgeClass}">${statut || 'N/A'}</span>`;
+    }
+
+    function formatMoney(amount) {
+        return new Intl.NumberFormat('fr-FR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(amount);
+    }
+
+    function formatDate(dateString) {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('fr-FR');
+    }
+
+    function fermerModalDetails() {
+        document.getElementById('modalDetails').style.display = 'none';
+    }
+
+    function telechargerPDF(pretId) {
+        // Afficher le loading overlay
+        document.getElementById('loadingOverlay').style.display = 'flex';
+        
+        // Créer un lien temporaire pour télécharger le PDF
+        const link = document.createElement('a');
+        link.href = apiBase + '/admin/prets/pdf/' + pretId;
+        link.download = `pret_${pretId}.pdf`;
+        link.target = '_blank';
+        
+        // Cacher le loading après un court délai
+        setTimeout(() => {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }, 1000);
+        
+        // Déclencher le téléchargement
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // Fermer les modales en cliquant en dehors
+    window.onclick = function(event) {
+        const modalDetails = document.getElementById('modalDetails');
+        if (event.target === modalDetails) {
+            fermerModalDetails();
+        }
+    }
+
+    // Gestionnaire d'événements pour la touche Escape
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            fermerModalDetails();
+        }
+    });
 
     function ouvrirModalPret() {
         document.getElementById('modalPret').style.display = 'block';
@@ -528,7 +846,7 @@
             const data = JSON.stringify({
                 pret_id: pretId
             });
-            ajax('POST', '/pret/rejeter', data, function(response) {
+            ajax('POST', apiBase + '/pret/rejeter', data, function(response) {
                 if (response.success) {
                     alert('Prêt rejeté avec succès !');
                     location.reload(); // Recharger la page pour voir les changements
@@ -545,7 +863,7 @@
                 pret_id: pretId
             });
 
-            ajax('POST', '/pret/valider', data, function(response) {
+            ajax('POST', apiBase + '/pret/valider', data, function(response) {
                 if (response.success) {
                     alert('Prêt validé avec succès !');
                     // Recharger la page pour voir les changements

@@ -347,9 +347,31 @@ class PretController
         }
 
         $pretDetails = $this->pretModel->detailPret($pretId);
-        Flight::render('client/template/template', [
-            'page' => 'detailsPret',
-            'pretDetails' => $pretDetails
-        ]);
+        
+        // Vérifier si c'est une requête AJAX
+        $isAjax = Flight::request()->query['ajax'] ?? false;
+        if ($isAjax) {
+            Flight::json([
+                'success' => true,
+                'data' => $pretDetails
+            ]);
+            return;
+        }
+        
+        // Déterminer si c'est un accès admin ou client
+        $currentPath = $_SERVER['REQUEST_URI'] ?? '';
+        if (strpos($currentPath, '/admin/') !== false) {
+            // Accès admin
+            Flight::render('admin/template/template', [
+                'page' => 'detailsPret',
+                'pretDetails' => $pretDetails
+            ]);
+        } else {
+            // Accès client
+            Flight::render('client/template/template', [
+                'page' => 'detailsPret',
+                'pretDetails' => $pretDetails
+            ]);
+        }
     }
 }

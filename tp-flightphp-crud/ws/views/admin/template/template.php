@@ -37,11 +37,15 @@
                 <i class="icon fas fa-plus-circle"></i>
                 <span>Ajouter Fonds</span>
             </a></li>
+            <li><a href="<?= BASE_URL ?>/admin/clients/nouveau" class="menu-item">
+                <i class="icon fas fa-user-plus"></i>
+                <span>Insérer Client</span>
+            </a></li>
             <li><a href="<?= BASE_URL ?>/admin/prets/nouveau" class="menu-item">
                 <i class="icon fas fa-plus"></i>
                 <span>Nouvelle Demande</span>
             </a></li>
-            <li><a href="<?= BASE_URL ?>/pret/listePret" class="menu-item">
+            <li><a href="<?= BASE_URL ?>/admin/prets" class="menu-item">
                 <i class="icon fas fa-list"></i>
                 <span>Liste des Prêts</span>
             </a></li>
