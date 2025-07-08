@@ -41,6 +41,9 @@
                 <i class="icon fas fa-calculator"></i>
                 <span>Simuler un prêt</span>
             </a></li>
+            <li><a href="<?= BASE_URL ?>/client/simulations" class="menu-item">
+                <i class="icon fas fa-list"></i>
+                <span>Mes simulations</span>
             <li><a href="<?= BASE_URL ?>/client/types-pret" class="menu-item">
                 <i class="icon fas fa-list-alt"></i>
                 <span>Types de prêt</span>

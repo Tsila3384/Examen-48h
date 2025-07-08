@@ -349,9 +349,16 @@ class PretController
 
     public function afficherSimulationPret()
     {
-        $pages = 'simulationPret';
-        Flight::render('admin/template/template', [
-            'page' => $pages
+        $user_id = $_SESSION['user_id'] ?? null;
+        if (!$user_id) {
+            Flight::redirect('/auth/connexion');
+            return;
+        }
+        $clientId = $this->clientModel->findClientByUserId($user_id);
+        $typesPret = $this->typePretModel->findAllByUser($clientId);
+        Flight::render('client/template/template', [
+            'page' => 'simulationPret',
+            'typesPret' => $typesPret
         ]);
     }
 
@@ -419,6 +426,182 @@ class PretController
             Flight::render('client/template/template', [
                 'page' => 'detailsPret',
                 'pretDetails' => $pretDetails
+            ]);
+        }
+    }
+
+    public function sauvegarderSimulation()
+    {
+        $input = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+        $user_id = $_SESSION['user_id'] ?? null;
+
+        if (!$user_id) {
+            Flight::json([
+                'success' => false,
+                'message' => 'Utilisateur non connecté'
+            ]);
+            return;
+        }
+
+        $clientId = $this->clientModel->findClientByUserId($user_id);
+        $montant = $input['montant'] ?? null;
+        $duree = $input['duree'] ?? null;
+        $tauxInteret = $input['taux_interet'] ?? null;
+        $tauxAssurance = $input['taux_assurance'] ?? 0;
+        $typePretId = $input['type_pret_id'] ?? null;
+        $delaiPremierRemboursement = $input['delai_premier_remboursement'] ?? 0;
+
+        if ($montant > 0 && $duree > 0 && $tauxInteret >= 0 && $tauxAssurance >= 0) {
+            try {
+                // Calculer l'amortissement
+                $amortissement = $this->pretModel->calculerAmortissement($montant, $tauxInteret, $duree, $tauxAssurance, $delaiPremierRemboursement);
+
+                // Sauvegarder la simulation
+                $simulationId = $this->pretModel->sauvegarderSimulation(
+                    $user_id,
+                    $clientId,
+                    $montant,
+                    $typePretId,
+                    $duree,
+                    $tauxInteret,
+                    $tauxAssurance,
+                    $delaiPremierRemboursement,
+                    $amortissement
+                );
+
+                Flight::json([
+                    'success' => true,
+                    'message' => 'Simulation sauvegardée avec succès',
+                    'simulation_id' => $simulationId
+                ]);
+            } catch (Exception $e) {
+                Flight::json([
+                    'success' => false,
+                    'message' => 'Erreur lors de la sauvegarde : ' . $e->getMessage()
+                ]);
+            }
+        } else {
+            Flight::json([
+                'success' => false,
+                'message' => 'Données invalides ou incomplètes'
+            ]);
+        }
+    }
+
+    public function convertirSimulationEnPret($simulationId)
+    {
+        $this->authController->verifierRole('client');
+        $user_id = $_SESSION['user_id'] ?? null;
+
+        if (!$user_id) {
+            $_SESSION['error_message'] = 'Utilisateur non connecté';
+            Flight::redirect('/client/simulations');
+            return;
+        }
+
+        try {
+            $simulation = $this->pretModel->findSimulationById($simulationId);
+            if (!$simulation || $simulation['user_id'] != $user_id) {
+                $_SESSION['error_message'] = 'Simulation introuvable ou non autorisée';
+                Flight::redirect('/client/simulations');
+                return;
+            }
+
+            $pretId = $this->pretModel->insererPret(
+                $simulation['client_id'],
+                $simulation['montant'],
+                $simulation['type_pret_id'],
+                date('Y-m-d'),
+                $simulation['duree_mois'],
+                $simulation['taux_assurance'],
+                $simulation['delai_premier_remboursement']
+            );
+
+            // Mettre à jour le statut de la simulation
+            $this->pretModel->updateSimulationStatus($simulationId, 'converti');
+
+            $_SESSION['success_message'] = 'Simulation convertie en prêt avec succès';
+            Flight::redirect('/user/listePret'); // ou la page de détail du prêt
+
+        } catch (Exception $e) {
+            $_SESSION['error_message'] = 'Erreur lors de la conversion : ' . $e->getMessage();
+            Flight::redirect('/client/simulations');
+        }
+    }
+
+    public function afficherSimulations()
+    {
+        $user_id = $_SESSION['user_id'] ?? null;
+        if (!$user_id) {
+            Flight::redirect('/login');
+            return;
+        }
+
+        $simulations = $this->pretModel->findSimulationsByUserId($user_id);
+        Flight::render('client/template/template', [
+            'page' => 'listeSimulations',
+            'simulations' => $simulations
+        ]);
+    }
+
+    public function comparerSimulations()
+    {
+        $this->authController->verifierRole('client');
+        $user_id = $_SESSION['user_id'] ?? null;
+
+        if (!$user_id) {
+            $_SESSION['error_message'] = 'Utilisateur non connecté';
+            Flight::redirect('/client/simulations');
+            return;
+        }
+
+        $input = $_POST;
+        $simulationIds = $input['simulation_ids'] ?? [];
+
+        if (count($simulationIds) !== 2) {
+            Flight::render('client/template/template', [
+                'page' => 'compareSimulations',
+                'error' => 'Veuillez sélectionner exactement deux simulations pour comparer.'
+            ]);
+            return;
+        }
+
+        try {
+            $simulations = [];
+            foreach ($simulationIds as $id) {
+                $simulation = $this->pretModel->findSimulationById($id);
+                if (!$simulation || $simulation['user_id'] != $user_id) {
+                    Flight::render('client/template/template', [
+                        'page' => 'compareSimulations',
+                        'error' => 'Simulation introuvable ou non autorisée'
+                    ]);
+                    return;
+                }
+
+                // Calculer les détails pour l'affichage
+                $amortissement = $this->pretModel->calculerAmortissement(
+                    $simulation['montant'],
+                    $simulation['taux_interet'],
+                    $simulation['duree_mois'],
+                    $simulation['taux_assurance'],
+                    $simulation['delai_premier_remboursement']
+                );
+                $simulation['type_pret_nom'] = $this->typePretModel->findById($simulation['type_pret_id'])['nom'] ?? 'N/A';
+                $simulation['mensualite_totale'] = $amortissement[0]['mensualite'];
+                $simulation['cout_total'] = array_sum(array_column($amortissement, 'mensualite'));
+                $simulation['cout_assurance'] = array_sum(array_column($amortissement, 'assurance'));
+
+                $simulations[] = $simulation;
+            }
+
+            Flight::render('client/template/template', [
+                'page' => 'compareSimulations',
+                'simulations' => $simulations
+            ]);
+        } catch (Exception $e) {
+            Flight::render('client/template/template', [
+                'page' => 'compareSimulations',
+                'error' => 'Erreur lors de la comparaison : ' . $e->getMessage()
             ]);
         }
     }
