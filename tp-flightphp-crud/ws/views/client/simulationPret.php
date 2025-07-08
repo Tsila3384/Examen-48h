@@ -231,7 +231,7 @@
                 mensualiteSansAssurance.textContent = `${mensualiteBase.toFixed(2)} Ar`;
                 assuranceMensuelle.textContent = `${firstMonth.assurance.toFixed(2)} Ar`;
                 mensualiteTotale.textContent = `${firstMonth.mensualite.toFixed(2)} Ar`;
-                coutTotal.textContent = `${(totalPret + totalAssurance).toFixed(2)} Ar`;
+                coutTotal.textContent = `${(totalPret).toFixed(2)} Ar`;
                 coutAssurance.textContent = `${totalAssurance.toFixed(2)} Ar`;
 
                 simulationResult.style.display = 'block';

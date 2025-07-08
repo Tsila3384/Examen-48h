@@ -342,6 +342,7 @@ class Pret
 
         return $amortissement;
     }
+
     public function detailPret($pretId)
     {
         $stmt = $this->db->prepare("select * from DetailPret where pret_id = ? LIMIT 1");

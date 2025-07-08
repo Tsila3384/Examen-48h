@@ -130,7 +130,7 @@ GROUP BY YEAR(m.date_mensualite), MONTH(m.date_mensualite)
 ORDER BY AnneeMois;
 
 
-
+select * from mensualite;
 
 
 

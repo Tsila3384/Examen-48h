@@ -57,7 +57,7 @@
             <div class="info-card">
                 <h3><i class="fas fa-calculator"></i> Simulation gratuite</h3>
                 <p>Calculez votre mensualité et obtenez une estimation immédiate.</p>
-                <a href="<?= BASE_URL ?>/simulation" class="btn btn-primary">Simuler un prêt</a>
+                <a href="<?= BASE_URL ?>/client/pret/simuler" class="btn btn-primary">Simuler un prêt</a>
             </div>
         </div>
 
