@@ -264,22 +264,6 @@ class PretController
         ]);
     }
 
-    public function afficherFondsDisponibles()
-    {
-        $dateDebut = Flight::request()->query['date_debut'] ?? null;
-        $dateFin = Flight::request()->query['date_fin'] ?? null;
-        if ($dateDebut && $dateFin) {
-            $fonds = $this->pretModel->getDispositionEFParMois($dateDebut, $dateFin);
-        }
-        else {
-            $fonds = $this->pretModel->getDispositionEF();
-        }
-        Flight::render('admin/template/template', [
-            'page' => 'tableauFonds',
-            'fonds' => $fonds
-        ]);
-    }
-
     public function afficherListeInteretsParMoisAjax()
     {
         $this->authController->verifierRole('admin');
@@ -297,38 +281,6 @@ class PretController
             'success' => true,
             'data' => $interets
         ]);
-    }
-
-    public function afficherFondsDisponiblesAjax()
-    {
-        try {
-            error_log("afficherFondsDisponiblesAjax appelée");
-            $this->authController->verifierRole('admin');
-            $dateDebut = Flight::request()->query['date_debut'] ?? null;
-            $dateFin = Flight::request()->query['date_fin'] ?? null;
-            
-            error_log("Paramètres: dateDebut=$dateDebut, dateFin=$dateFin");
-
-            if ($dateDebut && $dateFin) {
-                $fonds = $this->pretModel->getDispositionEFParMois($dateDebut, $dateFin);
-            } else {
-                $fonds = $this->pretModel->getDispositionEF();
-            }
-            
-            error_log("Données récupérées: " . json_encode($fonds));
-
-            // Retourner les données en JSON
-            Flight::json([
-                'success' => true,
-                'data' => $fonds
-            ]);
-        } catch (Exception $e) {
-            error_log("Erreur dans afficherFondsDisponiblesAjax: " . $e->getMessage());
-            Flight::json([
-                'success' => false,
-                'message' => 'Erreur: ' . $e->getMessage()
-            ]);
-        }
     }
 
     public function getPret($pretId)

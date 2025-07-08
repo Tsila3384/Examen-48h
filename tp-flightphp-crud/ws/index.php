@@ -126,8 +126,4 @@ Flight::route('POST /admin/taux/supprimer', [$tauxController, 'supprimerTaux']);
 Flight::route('GET /admin/interets', [$pretController, 'afficherListeInteretsParMois']);
 Flight::route('GET /admin/interets/ajax', [$pretController, 'afficherListeInteretsParMoisAjax']);
 
-// Routes Admin - Tableau des fonds
-Flight::route('GET /admin/fonds', [$pretController, 'afficherFondsDisponibles']);
-Flight::route('GET /admin/fonds/ajax', [$pretController, 'afficherFondsDisponiblesAjax']);
-
 Flight::start();

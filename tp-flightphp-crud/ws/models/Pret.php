@@ -350,16 +350,4 @@ class Pret
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result;
     }
-
-    public function getDispositionEFParMois($dateDebut, $dateFin)
-    {
-        $stmt = $this->db->prepare("SELECT * FROM view_mensualites_fonds_par_mois WHERE AnneeMois >= ? AND AnneeMois <= ? ORDER BY AnneeMois ASC");
-        $stmt->execute([$dateDebut, $dateFin]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-    public function getDispositionEF(){
-        $stmt = $this->db->prepare("SELECT * FROM view_mensualites_fonds_par_mois ORDER BY AnneeMois ASC");
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
 }

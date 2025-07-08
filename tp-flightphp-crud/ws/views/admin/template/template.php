@@ -61,10 +61,6 @@
                 <i class="icon fas fa-chart-bar"></i>
                 <span>Tableau et Graphe</span>
             </a></li>
-            <li><a href="<?= BASE_URL ?>/admin/fonds" class="menu-item">
-                <i class="icon fas fa-wallet"></i>
-                <span>Fonds Disponibles</span>
-            </a></li>
             <li><a href="<?= BASE_URL ?>/client/pret/simuler" class="menu-item">
                 <i class="icon fas fa-calculator"></i>
                 <span>Simuler Prêt</span>
