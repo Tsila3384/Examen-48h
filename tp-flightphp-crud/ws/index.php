@@ -3,6 +3,7 @@ require 'vendor/autoload.php';
 require 'db.php';
 require 'controllers/AuthController.php';
 require 'controllers/TypePretController.php';
+require 'controllers/TauxController.php';
 
 session_start();
 require_once('controllers/UserController.php');
@@ -13,6 +14,7 @@ $authController = new AuthController();
 $typePretController = new TypePretController();
 $userController = new UserController();
 $pretController = new PretController();
+$tauxController = new TauxController();
 
 
 $base_url = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME']));
@@ -23,6 +25,7 @@ $authController = new AuthController();
 $typePretController = new TypePretController();
 $pretController = new PretController();
 $userController = new UserController();
+$tauxController = new TauxController();
 
 
 // Routes publiques
@@ -122,5 +125,12 @@ Flight::route('POST /pret/valider', [$pretController, 'validerPret']);
 // Routes pour les intérêts
 Flight::route('GET /admin/interets', [$pretController, 'afficherListeInteretsParMois']);
 Flight::route('GET /admin/interets/ajax', [$pretController, 'afficherListeInteretsParMoisAjax']);
+
+// Routes pour les taux (admin)
+Flight::route('GET /admin/taux', [$tauxController, 'afficherListeTaux']);
+Flight::route('GET /admin/taux/ajax', [$tauxController, 'listerTaux']);
+Flight::route('POST /admin/taux/inserer', [$tauxController, 'insererTaux']);
+Flight::route('POST /admin/taux/modifier', [$tauxController, 'modifierTaux']);
+Flight::route('POST /admin/taux/supprimer', [$tauxController, 'supprimerTaux']);
 
 Flight::start();
