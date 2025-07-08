@@ -146,4 +146,11 @@ class User {
         $stmt->execute([$id]);
         return $stmt->fetchColumn();
     }
+
+    public function getFondsDisponibles() {
+        $stmt = $this->db->prepare("SELECT fonds_disponibles FROM etablissement WHERE id = 1");
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ? $result['fonds_disponibles'] : 0;
+    }
 }

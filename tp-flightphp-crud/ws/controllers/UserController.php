@@ -38,4 +38,13 @@ class UserController {
             ]); 
         }
     }
+
+    public function dashboard() {
+        $fondsDisponibles = $this->userModel->getFondsDisponibles();
+        $page = 'dashboard';
+        Flight::render('admin/template/template', [
+            'page' => $page,
+            'fonds_disponibles' => $fondsDisponibles
+        ]);
+    }
 }

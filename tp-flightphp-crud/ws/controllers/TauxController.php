@@ -1,9 +1,12 @@
 <?php
 require_once 'models/Taux.php';
+require_once 'AuthController.php';
 class TauxController {
     private $tauxModel;
+    private $authController;
     public function __construct() {
         $this->tauxModel = new Taux();
+        $this->authController = new AuthController();
     }
 
     public function insererTaux() {
@@ -110,6 +113,7 @@ class TauxController {
     }
     
     public function afficherListeTaux() {
+        $this->authController->verifierRole('admin');
         $typesClient = $this->tauxModel->getTypesClient();
         $typesPret = $this->tauxModel->getTypesPret();
         

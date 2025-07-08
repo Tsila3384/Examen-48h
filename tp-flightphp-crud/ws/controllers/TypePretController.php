@@ -1,18 +1,22 @@
 <?php
 require_once 'models/TypePret.php';
+require_once 'controllers/AuthController.php';
 
 class TypePretController
 {
     private $typePretModel;
+    private $authController;
 
     public function __construct()
     {
         $this->typePretModel = new TypePret();
+        $this->authController = new AuthController();
     }
 
     // Affiche le formulaire de création
     public function create()
     {
+        $this->authController->verifierRole('admin');
         Flight::render('admin/AddTypePret', [
             'base_url' => BASE_URL
         ]);
@@ -71,6 +75,7 @@ class TypePretController
     // Affiche la liste complète (admin)
     public function getAllTypes()
     {
+        $this->authController->verifierRole('admin');
         $types = $this->typePretModel->findAll();
         Flight::render('admin/template/template', [
             'page' => 'typePret',

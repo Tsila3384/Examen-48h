@@ -4,6 +4,7 @@ require_once 'models/Pret.php';
 require_once 'models/Client.php';
 require_once 'models/TypePret.php';
 require_once 'models/generate_pdf.php'; // Nouveau service PDF
+require_once 'controllers/AuthController.php';
 
 class PretController
 {
@@ -11,16 +12,20 @@ class PretController
     private $clientModel;
     private $typePretModel;
     private $pdfGenerator;
+    private $authController;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->pretModel = new Pret();
         $this->clientModel = new Client();
         $this->typePretModel = new TypePret();
         $this->pdfGenerator = new PDFGenerator(); // Initialisation du générateur PDF
+        $this->authController = new AuthController(); // Initialisation du contrôleur d'authentification
     }
 
     public function listePrets()
     {
+        $this->authController->verifierRole('admin'); // Vérification du rôle admin
         $prets = $this->pretModel->findAll();
         $clients = $this->clientModel->findAll();
 
@@ -32,40 +37,44 @@ class PretController
     }
 
     // Ajout de la méthode pour générer le PDF
- public function genererPDF($pretId)
-{
-    try {
-        if (!is_numeric($pretId)) {
-            throw new Exception("ID de prêt invalide");
-        }
-
-        $pretDetails = $this->pretModel->getPretDetailsForPDF($pretId);
-        
-        $requiredFields = [
-            'id', 'client_nom', 'type_pret', 'montant',
-            'statut', 'date_demande', 'duree_mois', 'taux_interet'
-        ];
-        
-        foreach ($requiredFields as $field) {
-            if (!isset($pretDetails[$field])) {
-                throw new Exception("Champ requis manquant: $field");
+    public function genererPDF($pretId)
+    {
+        try {
+            if (!is_numeric($pretId)) {
+                throw new Exception("ID de prêt invalide");
             }
+
+            $pretDetails = $this->pretModel->getPretDetailsForPDF($pretId);
+
+            $requiredFields = [
+                'id',
+                'client_nom',
+                'type_pret',
+                'montant',
+                'statut',
+                'date_demande',
+                'duree_mois',
+                'taux_interet'
+            ];
+
+            foreach ($requiredFields as $field) {
+                if (!isset($pretDetails[$field])) {
+                    throw new Exception("Champ requis manquant: $field");
+                }
+            }
+
+            $pdfGenerator = new PDFGenerator();
+            $pdfGenerator->generatePretPDF($pretDetails);
+        } catch (PDOException $e) {
+            $errorMsg = "Erreur base de données: " . $e->getMessage();
+            error_log($errorMsg);
+            Flight::redirect('/admin/prets?error=' . urlencode($errorMsg));
+        } catch (Exception $e) {
+            $errorMsg = "Erreur génération PDF: " . $e->getMessage();
+            error_log($errorMsg);
+            Flight::redirect('/admin/prets?error=' . urlencode($errorMsg));
         }
-
-        $pdfGenerator = new PDFGenerator();
-        $pdfGenerator->generatePretPDF($pretDetails);
-
-    } catch (PDOException $e) {
-        $errorMsg = "Erreur base de données: " . $e->getMessage();
-        error_log($errorMsg);
-        Flight::redirect('/admin/prets?error=' . urlencode($errorMsg));
-        
-    } catch (Exception $e) {
-        $errorMsg = "Erreur génération PDF: " . $e->getMessage();
-        error_log($errorMsg);
-        Flight::redirect('/admin/prets?error=' . urlencode($errorMsg));
     }
-}
 
     public function demandePret()
     {
@@ -131,7 +140,9 @@ class PretController
         }
     }
 
-    public function validerPret() {
+    public function validerPret()
+    {
+        $this->authController->verifierRole('admin');
         $input = json_decode(file_get_contents('php://input'), true);
         $pretId = $input['pret_id'] ?? null;
 
@@ -164,7 +175,9 @@ class PretController
         }
     }
 
-    public function rejeterPret() {
+    public function rejeterPret()
+    {
+        $this->authController->verifierRole('admin');
         $input = json_decode(file_get_contents('php://input'), true);
         $pretId = $input['pret_id'] ?? null;
 
@@ -218,32 +231,36 @@ class PretController
         ]);
     }
 
-    public function afficherListeInteretsParMois() {
+    public function afficherListeInteretsParMois()
+    {
+        $this->authController->verifierRole('admin');
         $dateDebut = Flight::request()->query['date_debut'] ?? null;
         $dateFin = Flight::request()->query['date_fin'] ?? null;
-        
+
         if ($dateDebut && $dateFin) {
             $interets = $this->pretModel->InteretsParMoisAnnee($dateDebut, $dateFin);
         } else {
             $interets = $this->pretModel->InteretsParMois();
         }
-        
+
         Flight::render('admin/template/template', [
             'page' => 'tableauInterets',
             'interets' => $interets
         ]);
     }
 
-    public function afficherListeInteretsParMoisAjax() {
+    public function afficherListeInteretsParMoisAjax()
+    {
+        $this->authController->verifierRole('admin');
         $dateDebut = Flight::request()->query['date_debut'] ?? null;
         $dateFin = Flight::request()->query['date_fin'] ?? null;
-        
+
         if ($dateDebut && $dateFin) {
             $interets = $this->pretModel->InteretsParMoisAnnee($dateDebut, $dateFin);
         } else {
             $interets = $this->pretModel->InteretsParMois();
         }
-        
+
         // Retourner les données en JSON
         Flight::json([
             'success' => true,
@@ -251,7 +268,8 @@ class PretController
         ]);
     }
 
-    public function getPret($pretId) {
+    public function getPret($pretId)
+    {
         $pret = $this->pretModel->findById($pretId);
         if ($pret) {
             Flight::json([
@@ -266,14 +284,16 @@ class PretController
         }
     }
 
-    public function afficherSimulationPret() {
-        $pages= 'simulationPret';
+    public function afficherSimulationPret()
+    {
+        $pages = 'simulationPret';
         Flight::render('client/template/template', [
             'page' => $pages
         ]);
     }
 
-    public function simulerPret() {
+    public function simulerPret()
+    {
         $input = json_decode(file_get_contents('php://input'), true);
         if (!$input) {
             $input = $_POST;
@@ -297,11 +317,12 @@ class PretController
             ]);
         }
     }
-    public function getDetailsPret($pretId = null) {
+    public function getDetailsPret($pretId = null)
+    {
         if (!$pretId) {
             $pretId = Flight::request()->query['pret_id'] ?? null;
         }
-        
+
         if (!$pretId) {
             Flight::json([
                 'success' => false,
@@ -309,12 +330,11 @@ class PretController
             ]);
             return;
         }
-        
+
         $pretDetails = $this->pretModel->detailPret($pretId);
         Flight::render('client/template/template', [
             'page' => 'detailsPret',
             'pretDetails' => $pretDetails
         ]);
     }
-
 }

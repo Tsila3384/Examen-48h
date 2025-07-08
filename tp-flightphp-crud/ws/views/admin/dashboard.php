@@ -56,6 +56,26 @@
         </div>
     </div>
 
+    <!-- Fonds Disponibles Section -->
+    <div class="fonds-section">
+        <div class="fonds-card">
+            <div class="fonds-header">
+                <h2><i class="fas fa-wallet"></i> Fonds Disponibles</h2>
+            </div>
+            <div class="fonds-content">
+                <div class="fonds-amount">
+                    <span class="amount-value"><?= number_format($fonds_disponibles ?? 0, 2, ',', ' ') ?></span>
+                    <span class="amount-currency">Ar</span>
+                </div>
+                <div class="fonds-status">
+                    <span class="status-indicator <?= ($fonds_disponibles ?? 0) > 100000 ? 'status-good' : 'status-low' ?>">
+                        <?= ($fonds_disponibles ?? 0) > 100000 ? 'Niveau optimal' : 'Niveau faible' ?>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Quick Actions -->
     <div class="quick-actions">
         <h2><i class="fas fa-bolt"></i> Actions rapides</h2>
@@ -94,7 +114,6 @@
         </div>
     </div>
 
-
     <!-- Logout Section -->
     <div class="logout-section">
         <form id="logoutForm" action="<?= BASE_URL ?>/auth/deconnexion" method="POST">
@@ -105,6 +124,93 @@
         </form>
     </div>
 </div>
+
+<style>
+/* Styles pour la section des fonds */
+.fonds-section {
+    margin: 20px 0;
+}
+
+.fonds-card {
+    background: linear-gradient(135deg,rgb(41, 53, 106) 0%,rgb(0, 0, 0) 100%);
+    border-radius: 15px;
+    padding: 25px;
+    color: white;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.fonds-header {
+    margin-bottom: 20px;
+}
+
+.fonds-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.fonds-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.fonds-amount {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.amount-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.amount-currency {
+    font-size: 1.2rem;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+.fonds-status {
+    text-align: right;
+}
+
+.status-indicator {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.status-good {
+    background: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+}
+
+.status-low {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+}
+
+@media (max-width: 768px) {
+    .fonds-content {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .fonds-status {
+        text-align: left;
+    }
+}
+</style>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/dashboard.css">
 

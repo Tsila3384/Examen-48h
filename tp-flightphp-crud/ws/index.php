@@ -68,7 +68,8 @@ Flight::route('/user/prets/pdf/@id', function($id){
 // Routes admin
 Flight::route('GET /admin/dashboard', function() use ($authController) {
     $authController->verifierRole('admin');
-    Flight::render('admin/template/template', ['page' => 'dashboard']);
+    $userController = new UserController();
+    $userController->dashboard();
 });
 
 $userController = new UserController();
