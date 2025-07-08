@@ -95,7 +95,7 @@
                 <div class="result-header">
                     <h2>Résultat de votre simulation</h2>
                 </div>
-
+                
                 <div class="result-main">
                     <div class="main-amount">
                         <span class="amount-label">Votre mensualité</span>
@@ -131,10 +131,6 @@
                         <span class="btn-icon"><i class="fas fa-file-signature"></i></span>
                         Faire une demande
                     </a>
-                    <button id="saveSimulation" class="btn-primary">
-                        <span class="btn-icon"><i class="fas fa-save"></i></span>
-                        Sauvegarder la simulation
-                    </button>
                 </div>
             </div>
         </div>
@@ -145,19 +141,19 @@
     const form = document.getElementById('simulationForm');
     const alert = document.getElementById('alert');
     const simulationResult = document.getElementById('simulationResult');
-
+    
     // Éléments du formulaire
     const montantInput = document.getElementById('montant');
     const dureeInput = document.getElementById('duree');
     const tauxInput = document.getElementById('taux_interet');
     const assuranceInput = document.getElementById('taux_assurance');
-
+    
     // Sliders
     const montantRange = document.getElementById('montantRange');
     const dureeRange = document.getElementById('dureeRange');
     const tauxRange = document.getElementById('tauxRange');
     const assuranceRange = document.getElementById('assuranceRange');
-
+    
     // Résultats
     const mensualiteTotale = document.getElementById('mensualiteTotale');
     const montantPret = document.getElementById('montantPret');
@@ -169,13 +165,13 @@
     // Synchronisation sliders et inputs
     montantRange.addEventListener('input', () => montantInput.value = montantRange.value);
     montantInput.addEventListener('input', () => montantRange.value = montantInput.value);
-
+    
     dureeRange.addEventListener('input', () => dureeInput.value = dureeRange.value);
     dureeInput.addEventListener('input', () => dureeRange.value = dureeInput.value);
-
+    
     tauxRange.addEventListener('input', () => tauxInput.value = tauxRange.value);
     tauxInput.addEventListener('input', () => tauxRange.value = tauxInput.value);
-
+    
     assuranceRange.addEventListener('input', () => assuranceInput.value = assuranceRange.value);
     assuranceInput.addEventListener('input', () => assuranceRange.value = assuranceInput.value);
 
@@ -239,9 +235,7 @@
                 coutAssurance.textContent = `${totalAssurance.toFixed(2)} Ar`;
 
                 simulationResult.style.display = 'block';
-                simulationResult.scrollIntoView({
-                    behavior: 'smooth'
-                });
+                simulationResult.scrollIntoView({ behavior: 'smooth' });
                 showAlert('Simulation effectuée avec succès', 'success');
             } else {
                 showAlert(result.message, 'error');
@@ -250,31 +244,6 @@
         } catch (error) {
             showAlert('Erreur de connexion au serveur', 'error');
             simulationResult.style.display = 'none';
-        }
-    });
-
-    document.getElementById('saveSimulation').addEventListener('click', async () => {
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData);
-
-        try {
-            const response = await fetch('<?= BASE_URL ?>/client/pret/sauvegarderSimulation', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                showAlert('Simulation sauvegardée avec succès', 'success');
-            } else {
-                showAlert(result.message, 'error');
-            }
-        } catch (error) {
-            showAlert('Erreur lors de la sauvegarde de la simulation', 'error');
         }
     });
 </script>

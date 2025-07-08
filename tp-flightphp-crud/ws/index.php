@@ -131,10 +131,3 @@ Flight::route('GET /admin/fonds', [$pretController, 'afficherFondsDisponibles'])
 Flight::route('GET /admin/fonds/ajax', [$pretController, 'afficherFondsDisponiblesAjax']);
 
 Flight::start();
-// Routes pour les simulations de prêt
-Flight::route('POST /client/pret/sauvegarderSimulation', [$pretController, 'sauvegarderSimulation']);
-Flight::route('GET /client/simulations', [$pretController, 'afficherSimulations']);
-Flight::route('POST /client/pret/convertirSimulation/@id', [$pretController, 'convertirSimulationEnPret']);
-Flight::route('POST /client/simulations/compare', [$pretController, 'comparerSimulations']);
-
-Flight::start();
