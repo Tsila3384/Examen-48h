@@ -288,6 +288,16 @@
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('active');
         }
+    <nav class="sidebar" id="sidebar">
+        <ul>
+            <li><a href="#" class="active">Dashboard</a></li>
+            <li><a href="<?= BASE_URL ?>/user/formulaireFond">Ajouter Fonds</a></li>
+            <li><a href="<?= BASE_URL ?>/pret/listePret">Gestion Prêts</a></li>
+            <li><a href="<?= BASE_URL ?>/admin/types-pret">Type de prêt</a></li>
+            <li><a href="<?= BASE_URL ?>/admin/taux">Gestion Taux</a></li>
+            <li><a href="<?= BASE_URL ?>/admin/interets">Tableau et Graphe</a></li>
+        </ul>
+    </nav>
 
         // Fermer la sidebar en cliquant en dehors
         document.addEventListener('click', function(event) {
