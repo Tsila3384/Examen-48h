@@ -49,10 +49,15 @@
                 <i class="icon fas fa-history"></i>
                 <span>Historique des prêts</span>
             </a></li>
+            <li><a href="<?= BASE_URL ?>/client/simulations" class="menu-item">
+                    <i class="icon fas fa-list"></i>
+                    <span>Mes simulations</span>
+            </a></li>
             <li><a href="<?= BASE_URL ?>/auth/deconnexion" class="menu-item logout">
                 <i class="icon fas fa-sign-out-alt"></i>
                 <span>Déconnexion</span>
             </a></li>
+            
         </ul>
     </nav>
 

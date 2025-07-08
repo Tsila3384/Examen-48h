@@ -180,7 +180,7 @@
     function updateTauxDisplay() {
         const selectedOption = typePretSelect.options[typePretSelect.selectedIndex];
         if (selectedOption && selectedOption.dataset.taux) {
-            tauxInteretDisplay.textContent = ${selectedOption.dataset.taux}%;
+            tauxInteretDisplay.textContent = `${selectedOption.dataset.taux}%`;
         } else {
             tauxInteretDisplay.textContent = '';
         }
@@ -193,7 +193,7 @@
 
     function showAlert(message, type) {
         alert.textContent = message;
-        alert.className = alert alert-${type};
+        alert.className = `alert alert-${type}`;
         alert.style.display = 'block';
         setTimeout(() => {
             alert.style.display = 'none';
@@ -245,12 +245,12 @@
                 const totalPret = amortissement.reduce((sum, month) => sum + month.mensualite, 0);
                 const mensualiteBase = firstMonth.mensualite - firstMonth.assurance;
 
-                montantPret.textContent = ${parseFloat(data.montant).toLocaleString()} Ar;
-                mensualiteSansAssurance.textContent = ${mensualiteBase.toFixed(2)} Ar;
-                assuranceMensuelle.textContent = ${firstMonth.assurance.toFixed(2)} Ar;
-                mensualiteTotale.textContent = ${firstMonth.mensualite.toFixed(2)} Ar;
-                coutTotal.textContent = ${totalPret.toFixed(2)} Ar;
-                coutAssurance.textContent = ${totalAssurance.toFixed(2)} Ar;
+                montantPret.textContent = `${parseFloat(data.montant).toLocaleString()} Ar`;
+                mensualiteSansAssurance.textContent = `${mensualiteBase.toFixed(2)} Ar`;
+                assuranceMensuelle.textContent = `${firstMonth.assurance.toFixed(2)} Ar`;
+                mensualiteTotale.textContent = `${firstMonth.mensualite.toFixed(2)} Ar`;
+                coutTotal.textContent = `${totalPret.toFixed(2)} Ar`;
+                coutAssurance.textContent = `${totalAssurance.toFixed(2)} Ar`;
 
                 simulationResult.style.display = 'block';
                 simulationResult.scrollIntoView({

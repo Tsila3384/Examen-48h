@@ -27,9 +27,9 @@
                         <td><?= $simulation['type_pret_nom'] ?? 'N/A' ?></td>
                         <td><?= $simulation['date_simulation'] ?></td>
                         <td>
-                            <form method="POST" action="<?= BASE_URL ?>/client/pret/convertirSimulation/<?= $simulation['id'] ?>" style="display: inline;">
-                                <button type="submit" class="btn-primary">Convertir en prêt</button>
-                            </form>
+                            <button type="button" class="btn-primary convert-btn" data-simulation-id="<?= $simulation['id'] ?>">
+                                Convertir en prêt
+                            </button>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -42,6 +42,12 @@
             </button>
         </div>
     </form>
+    
+    <!-- Formulaires de conversion (cachés) -->
+    <?php foreach ($simulations as $simulation): ?>
+        <form id="convertForm<?= $simulation['id'] ?>" method="POST" action="<?= BASE_URL ?>/client/pret/convertirSimulation/<?= $simulation['id'] ?>" style="display: none;">
+        </form>
+    <?php endforeach; ?>
 </div>
 
 <style>
@@ -194,6 +200,17 @@
                 e.preventDefault();
                 alert('Veuillez sélectionner exactement deux simulations pour comparer.');
             }
+        });
+
+        // Gestionnaire pour les boutons de conversion
+        document.querySelectorAll('.convert-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const simulationId = e.target.getAttribute('data-simulation-id');
+                const form = document.getElementById('convertForm' + simulationId);
+                if (form) {
+                    form.submit();
+                }
+            });
         });
     });
 </script>

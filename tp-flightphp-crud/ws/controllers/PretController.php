@@ -347,41 +347,74 @@ class PretController
 
     public function afficherSimulationPret()
     {
-        $user_id = $_SESSION['user_id'] ?? null;
-        if (!$user_id) {
-            Flight::redirect('/auth/connexion');
-            return;
+        // Déterminer le contexte (admin ou client)
+        $currentPath = $_SERVER['REQUEST_URI'] ?? '';
+        
+        if (strpos($currentPath, '/admin/') !== false) {
+            // Context admin
+            $this->authController->verifierRole('admin');
+            $typesPret = $this->typePretModel->findAll();
+            Flight::render('admin/template/template', [
+                'page' => 'simulationPret',
+                'typesPret' => $typesPret
+            ]);
+        } else {
+            // Context client
+            $this->authController->verifierRole('client');
+            $user_id = $_SESSION['user_id'] ?? null;
+            if (!$user_id) {
+                Flight::redirect('/auth/connexion');
+                return;
+            }
+            $clientId = $this->clientModel->findClientByUserId($user_id);
+            $typesPret = $this->typePretModel->findAllByUser($clientId);
+            Flight::render('client/template/template', [
+                'page' => 'simulationPret',
+                'typesPret' => $typesPret
+            ]);
         }
-        $clientId = $this->clientModel->findClientByUserId($user_id);
-        $typesPret = $this->typePretModel->findAllByUser($clientId);
-        Flight::render('client/template/template', [
-            'page' => 'simulationPret',
-            'typesPret' => $typesPret
-        ]);
     }
 
     public function simulerPret()
     {
-        $input = json_decode(file_get_contents('php://input'), true);
-        if (!$input) {
-            $input = $_POST;
-        }
+        try {
+            $input = json_decode(file_get_contents('php://input'), true);
+            if (!$input) {
+                $input = $_POST;
+            }
 
-        $montant = $input['montant'] ?? null;
-        $duree = $input['duree'] ?? null;
-        $tauxInteret = $input['taux_interet'] ?? null;
-        $tauxAssurance = $input['taux_assurance'] ?? 0;
+            $montant = $input['montant'] ?? null;
+            $duree = $input['duree'] ?? null;
+            $tauxInteret = $input['taux_interet'] ?? null;
+            $tauxAssurance = $input['taux_assurance'] ?? 0;
 
-        if ($montant > 0 && $duree > 0 && $tauxInteret >= 0 && $tauxAssurance >= 0) {
+            // Validation plus stricte
+            if (empty($montant) || empty($duree) || !is_numeric($montant) || !is_numeric($duree) || !is_numeric($tauxInteret)) {
+                Flight::json([
+                    'success' => false,
+                    'message' => 'Tous les champs requis doivent être remplis avec des valeurs numériques valides'
+                ]);
+                return;
+            }
+
+            if ($montant <= 0 || $duree <= 0 || $tauxInteret < 0 || $tauxAssurance < 0) {
+                Flight::json([
+                    'success' => false,
+                    'message' => 'Les valeurs doivent être positives (taux peuvent être à 0)'
+                ]);
+                return;
+            }
+
             $amortissement = $this->pretModel->calculerAmortissement($montant, $tauxInteret, $duree, $tauxAssurance, 0);
+            
             Flight::json([
                 'success' => true,
                 'data' => $amortissement
             ]);
-        } else {
+        } catch (Exception $e) {
             Flight::json([
                 'success' => false,
-                'message' => 'Données invalides ou incomplètes'
+                'message' => 'Erreur lors du calcul: ' . $e->getMessage()
             ]);
         }
     }

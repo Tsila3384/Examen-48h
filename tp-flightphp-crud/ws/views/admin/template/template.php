@@ -67,17 +67,7 @@
                     <i class="icon fas fa-chart-bar"></i>
                     <span>Tableau et Graphe</span>
                 </a></li>
-           
-            <li><a href="<?= BASE_URL ?>/client/simulations" class="menu-item">
-                    <i class="icon fas fa-list"></i>
-                    <span>Mes simulations</span>
-            </a></li>
-            <li><a href="<?= BASE_URL ?>/admin/prets/simulations" class="menu-item">
-                <i class="icon fas fa-list-alt"></i>
-                <span>Liste des Simulations</span>
-            </a></li>
-            
-            <li><a href="<?= BASE_URL ?>/auth/deconnexion" class="menu-item logout">
+             <li><a href="<?= BASE_URL ?>/auth/deconnexion" class="menu-item logout">
                     <i class="icon fas fa-sign-out-alt"></i>
                     <span>Déconnexion</span>
                 </a></li>
@@ -316,17 +306,6 @@
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('active');
         }
-        <nav class="sidebar" id="sidebar">
-            <ul>
-                <li><a href="<?= BASE_URL ?>/admin/dashboard" class="active">Dashboard</a></li>
-                <li><a href="<?= BASE_URL ?>/user/formulaireFond">Ajouter Fonds</a></li>
-                <li><a href="<?= BASE_URL ?>/admin/prets">Gestion Prêts</a></li>
-                <li><a href="<?= BASE_URL ?>/admin/prets/simuler">Simulateur Prêt</a></li>
-                <li><a href="<?= BASE_URL ?>/admin/types-pret">Type de prêt</a></li>
-                <li><a href="<?= BASE_URL ?>/admin/taux">Gestion Taux</a></li>
-                <li><a href="<?= BASE_URL ?>/admin/interets">Tableau et Graphe</a></li>
-            </ul>
-        </nav>
 
         // Fermer la sidebar en cliquant en dehors
         document.addEventListener('click', function (event) {
