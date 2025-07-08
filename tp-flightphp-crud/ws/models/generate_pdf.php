@@ -159,6 +159,7 @@ class PDFGenerator
         $this->addBoxInfoLine($pdf, 'Type de pret:', $pretDetails['type_pret']);
         $this->addBoxInfoLine($pdf, 'Montant:', $this->formatAmount($pretDetails['montant']));
         $this->addBoxInfoLine($pdf, 'Taux d\'interet:', $pretDetails['taux_interet'] . '%');
+        $this->addBoxInfoLine($pdf, 'Taux d\'assurance:', $pretDetails['taux_assurance'] . '%');
         $this->addBoxInfoLine($pdf, 'Duree (mois):', $pretDetails['duree_mois']);
         $this->addBoxInfoLine($pdf, 'Statut:', $pretDetails['statut']);
         $this->addBoxInfoLine($pdf, 'Date demande:', $this->formatDate($pretDetails['date_demande']));
