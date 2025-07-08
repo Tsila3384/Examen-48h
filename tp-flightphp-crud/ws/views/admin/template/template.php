@@ -45,6 +45,10 @@
                 <i class="icon fas fa-tags"></i>
                 <span>Types de prêt</span>
             </a></li>
+            <li><a href="<?= BASE_URL ?>/admin/taux" class="menu-item">
+                <i class="icon fas fa-percent"></i>
+                <span>Taux d'intérêt</span>
+            </a></li>
             <li><a href="<?= BASE_URL ?>/admin/interets" class="menu-item">
                 <i class="icon fas fa-chart-bar"></i>
                 <span>Tableau et Graphe</span>
