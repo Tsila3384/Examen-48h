@@ -30,8 +30,6 @@ class PretController
             'clients' => $clients
         ]);
     }
-
-    // Ajout de la méthode pour générer le PDF
  public function genererPDF($pretId)
 {
     try {
@@ -42,7 +40,7 @@ class PretController
         $pretDetails = $this->pretModel->getPretDetailsForPDF($pretId);
         
         $requiredFields = [
-            'id', 'client_nom', 'type_pret', 'montant',
+            'id', 'client_nom', 'type_pret', 'montant','taux_assurance',
             'statut', 'date_demande', 'duree_mois', 'taux_interet'
         ];
         
