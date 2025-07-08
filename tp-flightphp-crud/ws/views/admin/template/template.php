@@ -53,9 +53,9 @@
                 <i class="icon fas fa-chart-bar"></i>
                 <span>Tableau et Graphe</span>
             </a></li>
-            <li><a href="<?= BASE_URL ?>/client/pret/simuler" class="menu-item">
-                <i class="icon fas fa-calculator"></i>
-                <span>Simuler Prêt</span>
+            <li><a href="<?= BASE_URL ?>/admin/prets/simulations" class="menu-item">
+                <i class="icon fas fa-list-alt"></i>
+                <span>Liste des Simulations</span>
             </a></li>
             
             <li><a href="<?= BASE_URL ?>/auth/deconnexion" class="menu-item logout">

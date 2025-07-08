@@ -408,6 +408,18 @@ class Pret
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function findAllSimulations()
+    {
+        $stmt = $this->db->prepare("
+        SELECT s.*, c.nom as client_nom, tp.nom as type_pret_nom
+        FROM simulations s
+        LEFT JOIN clients c ON s.client_id = c.id
+        LEFT JOIN type_pret tp ON s.type_pret_id = tp.id
+    ");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function updateSimulationStatus($simulationId, $status)
     {
         $stmt = $this->db->prepare("UPDATE simulations SET statut = ? WHERE id = ?");

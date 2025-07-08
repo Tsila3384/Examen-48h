@@ -520,4 +520,199 @@ class PretController
             ]);
         }
     }
+
+    public function afficherSimulationPretAdmin()
+{
+    $this->authController->verifierRole('admin');
+    $clients = $this->clientModel->findAll();
+    $typesPret = $this->typePretModel->findAllWithTaux();
+
+    // Add type_client_id to each client
+    foreach ($clients as &$client) {
+        $client['type_client_id'] = $this->clientModel->getTypeClientId($client['id']);
+    }
+
+    Flight::render('admin/template/template', [
+        'page' => 'simulationPretAdmin',
+        'clients' => $clients,
+        'typesPret' => $typesPret
+    ]);
+}
+
+    public function simulerPretAdmin()
+    {
+        $this->authController->verifierRole('admin');
+        $input = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+
+        $clientId = $input['client_id'] ?? null;
+        $montant = $input['montant'] ?? null;
+        $duree = $input['duree'] ?? null;
+        $tauxInteret = $input['taux_interet'] ?? null;
+        $tauxAssurance = $input['taux_assurance'] ?? 0;
+
+        if ($clientId && $montant > 0 && $duree > 0 && $tauxInteret >= 0 && $tauxAssurance >= 0) {
+            $amortissement = $this->pretModel->calculerAmortissement($montant, $tauxInteret, $duree, $tauxAssurance, 0);
+            Flight::json([
+                'success' => true,
+                'data' => $amortissement
+            ]);
+        } else {
+            Flight::json([
+                'success' => false,
+                'message' => 'Données invalides ou incomplètes'
+            ]);
+        }
+    }
+
+
+    public function sauvegarderSimulationAdmin()
+    {
+        $this->authController->verifierRole('admin');
+        $input = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+
+        $clientId = $input['client_id'] ?? null;
+        $montant = $input['montant'] ?? null;
+        $duree = $input['duree'] ?? null;
+        $tauxInteret = $input['taux_interet'] ?? null;
+        $tauxAssurance = $input['taux_assurance'] ?? 0;
+        $typePretId = $input['type_pret_id'] ?? null;
+        $delaiPremierRemboursement = $input['delai_premier_remboursement'] ?? 0;
+
+        if ($clientId && $montant > 0 && $duree > 0 && $tauxInteret >= 0 && $tauxAssurance >= 0) {
+            try {
+                $amortissement = $this->pretModel->calculerAmortissement($montant, $tauxInteret, $duree, $tauxAssurance, $delaiPremierRemboursement);
+                $userId = $this->clientModel->findById($clientId)['user_id'] ?? null;
+
+                if (!$userId) {
+                    throw new Exception('Utilisateur associé au client introuvable');
+                }
+
+                $simulationId = $this->pretModel->sauvegarderSimulation(
+                    $userId,
+                    $clientId,
+                    $montant,
+                    $typePretId,
+                    $duree,
+                    $tauxInteret,
+                    $tauxAssurance,
+                    $delaiPremierRemboursement,
+                    $amortissement
+                );
+
+                Flight::json([
+                    'success' => true,
+                    'message' => 'Simulation sauvegardée avec succès',
+                    'simulation_id' => $simulationId
+                ]);
+            } catch (Exception $e) {
+                Flight::json([
+                    'success' => false,
+                    'message' => 'Erreur lors de la sauvegarde : ' . $e->getMessage()
+                ]);
+            }
+        } else {
+            Flight::json([
+                'success' => false,
+                'message' => 'Données invalides ou incomplètes'
+            ]);
+        }
+    }
+
+    public function convertirSimulationEnPretAdmin($simulationId)
+    {
+        $this->authController->verifierRole('admin');
+
+        try {
+            $simulation = $this->pretModel->findSimulationById($simulationId);
+            if (!$simulation) {
+                $_SESSION['error_message'] = 'Simulation introuvable';
+                Flight::redirect('/admin/prets/simulations');
+                return;
+            }
+
+            $pretId = $this->pretModel->insererPret(
+                $simulation['client_id'],
+                $simulation['montant'],
+                $simulation['type_pret_id'],
+                date('Y-m-d'),
+                $simulation['duree_mois'],
+                $simulation['taux_assurance'],
+                $simulation['delai_premier_remboursement']
+            );
+
+            $this->pretModel->updateSimulationStatus($simulationId, 'converti');
+
+            $_SESSION['success_message'] = 'Simulation convertie en prêt avec succès';
+            Flight::redirect('/pret/listePret');
+        } catch (Exception $e) {
+            $_SESSION['error_message'] = 'Erreur lors de la conversion : ' . $e->getMessage();
+            Flight::redirect('/admin/prets/simulations');
+        }
+    }
+
+    public function afficherSimulationsAdmin()
+    {
+        $this->authController->verifierRole('admin');
+        $simulations = $this->pretModel->findAllSimulations();
+        Flight::render('admin/template/template', [
+            'page' => 'listeSimulationsAdmin',
+            'simulations' => $simulations
+        ]);
+    }
+
+    public function comparerSimulationsAdmin()
+    {
+        $this->authController->verifierRole('admin');
+        $input = $_POST;
+        $simulationIds = $input['simulation_ids'] ?? [];
+
+        if (count($simulationIds) !== 2) {
+            Flight::render('admin/template/template', [
+                'page' => 'compareSimulationsAdmin',
+                'error' => 'Veuillez sélectionner exactement deux simulations pour comparer.'
+            ]);
+            return;
+        }
+
+        try {
+            $simulations = [];
+            foreach ($simulationIds as $id) {
+                $simulation = $this->pretModel->findSimulationById($id);
+                if (!$simulation) {
+                    Flight::render('admin/template/template', [
+                        'page' => 'compareSimulationsAdmin',
+                        'error' => 'Simulation introuvable'
+                    ]);
+                    return;
+                }
+
+                $client = $this->clientModel->findById($simulation['client_id']);
+                $simulation['client_nom'] = $client['nom'] ?? 'N/A';
+
+                $amortissement = $this->pretModel->calculerAmortissement(
+                    $simulation['montant'],
+                    $simulation['taux_interet'],
+                    $simulation['duree_mois'],
+                    $simulation['taux_assurance'],
+                    $simulation['delai_premier_remboursement']
+                );
+                $simulation['type_pret_nom'] = $this->typePretModel->findById($simulation['type_pret_id'])['nom'] ?? 'N/A';
+                $simulation['mensualite_totale'] = $amortissement[0]['mensualite'];
+                $simulation['cout_total'] = array_sum(array_column($amortissement, 'mensualite'));
+                $simulation['cout_assurance'] = array_sum(array_column($amortissement, 'assurance'));
+
+                $simulations[] = $simulation;
+            }
+
+            Flight::render('admin/template/template', [
+                'page' => 'compareSimulationsAdmin',
+                'simulations' => $simulations
+            ]);
+        } catch (Exception $e) {
+            Flight::render('admin/template/template', [
+                'page' => 'compareSimulationsAdmin',
+                'error' => 'Erreur lors de la comparaison : ' . $e->getMessage()
+            ]);
+        }
+    }
 }

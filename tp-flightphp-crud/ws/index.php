@@ -140,4 +140,12 @@ Flight::route('GET /client/simulations', [$pretController, 'afficherSimulations'
 Flight::route('POST /client/pret/convertirSimulation/@id', [$pretController, 'convertirSimulationEnPret']);
 Flight::route('POST /client/simulations/compare', [$pretController, 'comparerSimulations']);
 
+// Routes pour les simulations de prêt (admin)
+Flight::route('GET /admin/prets/simulations', [$pretController, 'afficherSimulationsAdmin']);
+Flight::route('GET /admin/prets/simuler', [$pretController, 'afficherSimulationPretAdmin']);
+Flight::route('POST /admin/prets/simuler', [$pretController, 'simulerPretAdmin']);
+Flight::route('POST /admin/prets/sauvegarderSimulation', [$pretController, 'sauvegarderSimulationAdmin']);
+Flight::route('POST /admin/prets/convertirSimulation/@id', [$pretController, 'convertirSimulationEnPretAdmin']);
+Flight::route('POST /admin/simulations/compare', [$pretController, 'comparerSimulationsAdmin']);
+
 Flight::start();
