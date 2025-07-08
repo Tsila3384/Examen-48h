@@ -134,4 +134,10 @@ Flight::route('POST /admin/taux/inserer', [$tauxController, 'insererTaux']);
 Flight::route('POST /admin/taux/modifier', [$tauxController, 'modifierTaux']);
 Flight::route('POST /admin/taux/supprimer', [$tauxController, 'supprimerTaux']);
 
+// Routes pour les simulations de prêt
+Flight::route('POST /client/pret/sauvegarderSimulation', [$pretController, 'sauvegarderSimulation']);
+Flight::route('GET /client/simulations', [$pretController, 'afficherSimulations']);
+Flight::route('POST /client/pret/convertirSimulation/@id', [$pretController, 'convertirSimulationEnPret']);
+Flight::route('POST /client/simulations/compare', [$pretController, 'comparerSimulations']);
+
 Flight::start();

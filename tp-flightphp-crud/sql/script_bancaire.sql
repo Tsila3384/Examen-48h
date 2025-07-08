@@ -229,3 +229,34 @@ JOIN type_pret tp ON p.type_pret_id = tp.id
 JOIN statut s ON p.id_statut = s.id
 JOIN view_taux_pret v ON p.id = v.pret_id
 JOIN mensualite m ON p.id = m.pret_id ORDER BY m.date_mensualite ASC;
+
+
+CREATE TABLE simulations (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    montant DECIMAL(12,2) NOT NULL,
+    duree_mois INT NOT NULL,
+    taux_interet DECIMAL(5,2) NOT NULL,
+    taux_assurance DECIMAL(5,2) DEFAULT 0,
+    date_simulation DATETIME DEFAULT CURRENT_TIMESTAMP,
+    client_id INT,
+    type_pret_id INT,
+    delai_premier_remboursement INT DEFAULT 0,
+    statut ENUM('brouillon', 'converti') DEFAULT 'brouillon',
+    FOREIGN KEY(user_id) REFERENCES users(id),
+    FOREIGN KEY(client_id) REFERENCES clients(id),
+    FOREIGN KEY(type_pret_id) REFERENCES type_pret(id)
+);
+
+CREATE TABLE simulation_mensualites (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    simulation_id INT NOT NULL,
+    mois INT NOT NULL,
+    date_mensualite DATE NOT NULL,
+    montant DECIMAL(12,2) NOT NULL,
+    montant_capital DECIMAL(10,2) NOT NULL,
+    montant_interets DECIMAL(10,2) NOT NULL,
+    montant_assurance DECIMAL(10,2) NOT NULL,
+    capital_restant DECIMAL(12,2) NOT NULL,
+    FOREIGN KEY(simulation_id) REFERENCES simulations(id)
+);
