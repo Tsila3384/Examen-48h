@@ -334,7 +334,7 @@
                 if (result.success) {
                     showAlert(result.message, 'success');
                     setTimeout(() => {
-                        window.location.href = '<?= BASE_URL ?>/pret/listePret';
+                        window.location.href = '<?= BASE_URL ?>/admin/prets';
                     }, 2000);
                 } else {
                     showAlert(result.message, 'error');
